@@ -1,4 +1,5 @@
-module energy
+module energies
+    use types, only: dp
     use parameters
     implicit none
     save
@@ -29,10 +30,9 @@ contains
                 ! Distancia Euclidiana
                 rij = norm2([xij, yij, zij])
                 ! Aplicar el valor del potencial
-                if (rij <. rc) then
-                    dB = dl / (dl-1._dp)
-                    if (rij <. dB) then
-                        call potential(rij, uij)uij
+                if (rij < rc) then
+                    if (rij < bpot) then
+                        call potential(rij, uij)
                     else
                         uij = 0._dp
                     end if
@@ -67,8 +67,7 @@ contains
             rij = norm2([xij, yij, zij])
             ! Aplicar el valor del potencial
             if (rij < rc) then
-                dB = dl/(dl-1._dp)
-                if (rij < dB) then
+                if (rij < bpot) then
                     call potential(rij, uij)
                 else
                     uij = 0._dp
@@ -85,9 +84,8 @@ contains
         ! Local
         real(dp) :: dA
 
-        dA = dl*(dl/(dl-1._dp))**(dl-1._dp)
-        uij = (dA/dT)*((1._dp/rij)**dl-(1._dp/rij)**(dl-1._dp))
-        uij = uij+1._dp/dT
+        uij = (a2/dT)*((1._dp/rij)**dlr-(1._dp/rij)**dla)
+       uij = uij + 1._dp/dT
 
     end subroutine potential
-end module energy
+end module energies

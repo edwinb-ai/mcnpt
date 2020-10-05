@@ -1,17 +1,17 @@
 module movement
+    use types, only: dp
     use parameters
-    use energy, only: denergy
+    use energies, only: denergy
     use observables, only: rdf, sq
     implicit none
     save
     public mcmove, adjust, average
 contains
     ! This subroutine displace the system to a new configuration
-    subroutine mcmove(x, y, z, ener, nattemp, nacc, del, iseed)
+    subroutine mcmove(x, y, z, ener, nattemp, nacc, del)
     real(dp), intent(in) :: del
     real(dp), intent(inout) :: ener
-    integer, intent(inout) :: nattemp, nacc, iseed
-    ! note that is include iseed becuase it is update in ranf function
+    integer, intent(inout) :: nattemp, nacc
     real(dp), intent(inout) :: x(:), y(:), z(:)
     ! it is because are evaluate
 
@@ -20,8 +20,7 @@ contains
     real(dp) :: xo, yo, zo, enero, enern, dener
     real(dp) :: rng
 
-    nattemp = nattemp + 1 ! contador de numeros de intento para mover una particula
-    !print*, 'primer', iseed
+    nattemp = nattemp + 1
 
     call random_number(rng)
     no = int(rng*np)+1
@@ -57,16 +56,18 @@ contains
     end if
     end subroutine mcmove ! the out is  ener, nattemp, nacc
 
-    subroutine average(x, y, z, g, s, ener, nattemp, nacc, ng, naveg, del, dr)
+    subroutine average(x, y, z, g, s, ener, nattemp, nacc, ng, naveg, del, dr, pbc)
     real(dp), intent(inout) :: x(:), y(:), z(:)
     real(dp), intent(inout) :: g(:), s(:)
 
     real(dp), intent(in) :: del, dr
     integer, intent(inout) :: nattemp, nacc, naveg, ng
     real(dp), intent(inout) :: ener
+    integer, intent(in) :: pbc
 
     ! Local variables
-    integer :: no, rng
+    integer :: no
+    real(dp) :: rng
     real(dp) :: xo, yo, zo, enero, enern, dener
     
     nattemp = nattemp + 1
@@ -104,8 +105,8 @@ contains
         ! Calcular observables
         if (mod(ng, np) == 0) then
             naveg = naveg + 1
-            call rdf(x, y, z, dr, g)
-            call sq(x, y, z, s)
+            call rdf(x, y, z, dr, g, pbc)
+            call sq(x, y, z, s, pbc)
         end if
     else
         x(no) = xo

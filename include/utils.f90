@@ -1,4 +1,5 @@
 module utils
+    use types, only: dp
     use parameters, only: np, rc, rho
     implicit none
     save

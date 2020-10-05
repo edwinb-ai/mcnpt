@@ -26,4 +26,4 @@ set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} ${dialect}")
 #
 # Esta linea junta a todos los archivos y al programa principal
 file(GLOB_RECURSE sources include/*.f90 src/*.f90)
-add_executable(dbrown ${sources})
+add_executable(mcfort ${sources})
