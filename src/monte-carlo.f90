@@ -20,11 +20,11 @@ program main
     ! Condiciones periódicas a la frontera
     integer :: pbc = 1
 
-    ! Leer de un archivo de entrada los valores del usuario
-    open (newunit=u, file='entrada.in', status='old')
+    ! Read an input file that contains all the necessary information
+    open (newunit=u, file='input.in', status='old')
     read (u, *) phi, np, nvq, limG
     close (u)
-    ! Actualizar los parámetros de simulación
+    ! Update the simulation parameters with this information
     rho = 6.0_dp*real(phi)/pi
     boxl = (np/rho)**(1._dp/3._dp)
     rc = boxl/2.0_dp
@@ -46,9 +46,9 @@ program main
         q(i) = (i-1)*dq
     end do
 
-    ! Valores iniciales para los vectores de onda
+    ! Randomly initialize the q-vectors
     allocate( qx(mr, nvq), qy(mr, nvq), qz(mr, nvq) )
-    open(newunit=u, file = 'qvectors_N.dat', status = 'unknown')
+    open(newunit=u, file = 'qvectors.dat', status = 'unknown')
     do i = 1, mr
         do j = 1, nvq
             call random_number(rng)
@@ -75,7 +75,7 @@ program main
     print*, 'E/N for the initial configuration:', ener/np
 
     ! MC cycle to thermalize the system
-    open(newunit=u, file = 'energy_N.dat', status = 'unknown')
+    open(newunit=u, file = 'energy.dat', status = 'unknown')
     do i = 1, limT
         call mcmove(x, y, z, ener, nattemp, nacc, del)
         call adjust(nattemp, nacc, del)
@@ -92,7 +92,7 @@ program main
     print*, 'The system has thermalized'
     close(u)
     ! write the final configuration and the energy
-    open(newunit=u, file = 'finalconf_N.dat', status = 'unknown')
+    open(newunit=u, file = 'finalconf.dat', status = 'unknown')
     do i = 1, np
         write(u, '(3f15.7)') x(i), y(i), z(i)
     end do
@@ -110,13 +110,11 @@ program main
 
     nav = nacc-nacco
 
-    print*,'Average number for energy: ', nav ! cual es la diferencia nav y naveg
+    print*,'Average number for energy: ', nav
     print*,'Average number for g(r): ', naveg
 
-!    stop 'final de 2da subrutinas'
-
-! This is the radial distribution function
-    open(newunit=u, file = 'gr_o_N.dat', status = 'unknown')
+    ! This is the radial distribution function
+    open(newunit=u, file = 'gr.dat', status = 'unknown')
     do i = 2, mr
         r(i) = (i-1)*dr
         dv = (4._dp*pi*r(i)**2._dp*dr)*rho
@@ -125,8 +123,8 @@ program main
     end do
     close(u)
 
-! This is the structure factor from the definition
-    open(newunit=u, file = 'sq_o_N.dat', status = 'unknown')
+    ! This is the structure factor from the definition
+    open(newunit=u, file = 'sq.dat', status = 'unknown')
     do i = 3, mr
         s(i) = s(i)/naveg
         if (q(i) < 40._dp) then
