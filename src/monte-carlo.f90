@@ -15,7 +15,7 @@ program main
     integer :: nattemp = 0
     integer :: nacc = 1, nacco, nav, i, j, ncq = 0
     integer :: ng = 0, naveg = 0
-    integer, parameter :: limT = 2000000
+    integer, parameter :: limT = 4000000
     integer :: limG, u
     ! Condiciones periódicas a la frontera
     integer :: pbc = 1
