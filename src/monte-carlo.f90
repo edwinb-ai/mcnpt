@@ -22,7 +22,7 @@ program main
 
     ! Read an input file that contains all the necessary information
     open (newunit=u, file='input.in', status='old')
-    read (u, *) phi, np, nvq, limG
+    read (u, *) phi, np, nvq, mr, limG
     close (u)
     ! Update the simulation parameters with this information
     rho = 6.0_dp*real(phi)/pi
