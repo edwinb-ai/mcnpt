@@ -56,9 +56,9 @@ program main
             call random_number(rng)
             dphi = 2.0_dp * pi * rng
 
-            qx(i,j) = q(i)*cos(dphi)*sin(dt)
-            qy(i,j) = q(i)*sin(dphi)*sin(dt)
-            qz(i,j) = q(i)*cos(dt)
+            qx(i,j) = q(i)*cos(dphi)*sin(dt2)
+            qy(i,j) = q(i)*sin(dphi)*sin(dt2)
+            qz(i,j) = q(i)*cos(dt2)
 
             ncq = ncq + 1
             qs = norm2([qx(i,j), qy(i,j), qz(i,j)])

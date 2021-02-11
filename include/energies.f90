@@ -10,26 +10,26 @@ contains
         real(dp), intent(in) :: x(:), y(:), z(:)
         real(dp), intent(out) :: ener
 
-    ! Local variables
+        ! Local variables
         integer :: i, j
         real(dp) :: rij, xij, yij, zij, dB, uij
         
-        ! Inicializar variables
         ener = 0._dp
 
         do i = 1, np - 1
             do j = i + 1, np
-                ! Distancias
+
                 xij = x(j)-x(i)
                 yij = y(j)-y(i)
                 zij = z(j)-z(i)
-                ! Condiciones periódicas a la frontera  
+
+                ! Minimum image convention
                 xij = xij-boxl*dnint(xij/boxl)
                 yij = yij-boxl*dnint(yij/boxl)
                 zij = zij-boxl*dnint(zij/boxl)
-                ! Distancia Euclidiana
+
                 rij = norm2([xij, yij, zij])
-                ! Aplicar el valor del potencial
+                
                 if (rij < rc) then
                     if (rij < bpot) then
                         call potential(rij, uij)
@@ -53,19 +53,19 @@ contains
 
         dener = 0._dp ! initializing
         do i = 1, np
-            ! Si las partículas son iguales, que se salte la iteración
             if ( i == no ) cycle
-            ! Distancias
+
             xij = x(no)-x(i)
             yij = y(no)-y(i)
             zij = z(no)-z(i)
-            ! Condiciones periódicas a la frontera
+            
+            ! Minimum image convention
             xij = xij-boxl*dnint(xij/boxl)
             yij = yij-boxl*dnint(yij/boxl)
             zij = zij-boxl*dnint(zij/boxl)
-            ! Distancia Euclidiana
+            
             rij = norm2([xij, yij, zij])
-            ! Aplicar el valor del potencial
+
             if (rij < rc) then
                 if (rij < bpot) then
                     call potential(rij, uij)

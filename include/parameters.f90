@@ -16,6 +16,6 @@ module parameters
     ! User dependant parameters
     real(dp) :: phi, rho, boxl, rc
     integer :: np, nvq ! Number of particles
-    integer, parameter :: mr = 2**10
+    integer, parameter :: mr = 2**12
     real(dp), allocatable :: qx(:, :), qy(:, :), qz(:, :)
 end module parameters
