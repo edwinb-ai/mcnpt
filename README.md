@@ -2,6 +2,7 @@
 
 This code can run Monte Carlo simulations using a pseudo hard sphere
 potential.
+
 It is written from the ground up to be very fast and efficient.
 
 ## Build
@@ -12,7 +13,7 @@ To build and use this code, first create a build directory
 mkdir build
 ```
 
-then, inside this directory
+then, inside this directory run the following
 
 ```shell
 cmake -GNinja ..
@@ -21,10 +22,22 @@ cmake -GNinja ..
 This command expects that you have installed the [ninja](https://ninja-build.org/)
 build system.
 
+Then, just run
+
+```shell
+ninja
+```
+
 In case you only have `make` just run
 
 ```shell
 cmake ..
+```
+
+and then run
+
+```shell
+make
 ```
 
 Either way, an executable `mcfort` will be created inside the build directory.
@@ -34,7 +47,7 @@ This is the main executable.
 
 The `mcfort` executable expects a file called `input.in` with *four values* in it:
 
-- Packing fraction, a value between (0, 0.49]. This value will determine the density of the system.
+- Packing fraction, a value between strictly larger than 0 and strictly less than 0.49. Any value in between is acceptable. This value will determine the density of the system.
 - number of particles, an integer. The larger this value, the longer it will take to run a simulation.
 - spacing for S(q), the structure factor needs a spacing value. The larger this value, the longer it will take to run a simulation.
 - Number of Monte Carlo cycles, this is the value to use in order to compute the observables.
