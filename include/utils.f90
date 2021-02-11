@@ -1,19 +1,17 @@
 module utils
     use types, only: dp
-    use parameters, only: np, rc, rho
+    use parameters, only: np, rc
     implicit none
     save
     public iniconfig
 contains
-    subroutine iniconfig(x, y, z)
-
+    subroutine iniconfig(x, y, z, d)
     ! defining three vector of mp dimension, it indicate that only are out variables
         real(dp), intent(inout) :: x(:), y(:), z(:)
+        real(dp), intent(in) :: d
 
         ! Local variables
         integer :: i ! it is neccesary for restart i
-        real(dp), parameter :: d = rho**(-1._dp/3._dp) !distance mean between particle
-        ! d = distance Mean entre particles
         x(1) = -rc + d/2._dp
         y(1) = -rc + d/2._dp
         z(1) = -rc + d/2._dp

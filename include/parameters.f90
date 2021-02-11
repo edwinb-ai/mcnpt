@@ -9,20 +9,13 @@ module parameters
     real(dp), parameter :: a2 = (dlr/(dlr-dla))*(dlr/dla)**(dla/(dlr-dla))
     real(dp), parameter :: bpot = (dlr/dla)**(1.0_dp/(dlr-dla))
 
-    ! parameters arguments
-    real(dp), parameter :: phi = 0.45_dp
+    ! constant values
     real(dp), parameter :: pi = 4.0_dp*atan(1.0_dp)
-    real(dp), parameter :: rho = 6.0_dp*phi/pi
     real(dp), parameter :: diam = 1.0_dp
 
-    ! box arguments
-    integer, parameter :: np = 6**3! number of particles
-
-    real(dp), parameter :: boxl = (np/rho)**(1.0_dp/3.0_dp)
-    real(dp), parameter :: rc = boxl/2.0_dp
-
-    ! mp and mr arguments
-    integer, parameter :: mp = 1024, mr = 2**9
-    integer, parameter :: nvq = 20
+    ! User dependant parameters
+    real(dp) :: phi, rho, boxl, rc
+    integer :: np, nvq ! Number of particles
+    integer, parameter :: mr = 2**10
     real(dp), allocatable :: qx(:, :), qy(:, :), qz(:, :)
 end module parameters

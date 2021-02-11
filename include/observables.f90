@@ -46,8 +46,7 @@ contains
     integer :: i, kq, k, j
     real(dp) :: xaux, yaux, zaux, rij, arg, sum, parti, auxsq
 
-    do i = 2, mr ! why i star in 2
-        ! creating two zero vectors with leng nvq
+    do i = 2, mr
         do kq = 1, nvq
             auxc(kq) = 0._dp
             auxs(kq) = 0._dp
@@ -85,5 +84,5 @@ contains
         auxsq = sum/(nvq*parti)
         s(i) = s(i)+auxsq
     end do
-    end subroutine sq ! out s
+    end subroutine sq
 end module observables

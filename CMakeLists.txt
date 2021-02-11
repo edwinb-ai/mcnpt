@@ -6,7 +6,7 @@ project(mcfort)
 enable_language(Fortran)
 
 if(CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
-    set(dialect "-ffree-form -std=f2008 -fimplicit-none -fPIC -Ofast -march=native -funroll-loops")
+    set(dialect "-ffree-form -std=f2008 -g -fimplicit-none -fPIC -Ofast -march=native -funroll-loops")
     set(bounds "-fbounds-check")
 endif()
 if(CMAKE_Fortran_COMPILER_ID MATCHES "Intel")
