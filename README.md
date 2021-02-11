@@ -57,7 +57,7 @@ The `mcfort` executable expects a file called `input.in` with *four values* in i
 By default, this code will compute two main observables:
 
 - The radial distribution function, also known as g(r);
-- the structure factor, from the definition, also known as S(q).
+- the structure factor, from the Statistical Mechanics definition, also known as S(q).
 
 These will appear as files named `gr.dat` and `sq.dat`.
 
