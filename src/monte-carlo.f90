@@ -84,7 +84,7 @@ program main
             write(u, '(2f15.7)') i*1._dp, ener/np
         end if
         
-        if (mod(i, 50000) == 0) then
+        if (mod(i, 500000) == 0) then
             print*, i, del, ener/np
         end if
     end do
@@ -105,7 +105,7 @@ program main
     do i = 1, limG
         call average(x, y, z, g, s, ener, nattemp, nacc, ng, naveg, del, dr, pbc)
         call adjust(nattemp, nacc, del)
-        if (mod(i, 10000) == 0) print*, i, 'calculating g(r) and S(q)'
+        if (mod(i, 100000) == 0) print*, i, 'calculating g(r) and S(q)'
     end do
 
     nav = nacc-nacco
