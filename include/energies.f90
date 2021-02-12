@@ -24,12 +24,12 @@ contains
                 zij = z(j)-z(i)
 
                 ! Minimum image convention
-                xij = xij-boxl*dnint(xij/boxl)
-                yij = yij-boxl*dnint(yij/boxl)
-                zij = zij-boxl*dnint(zij/boxl)
+                xij = xij-boxl*nint(xij/boxl)
+                yij = yij-boxl*nint(yij/boxl)
+                zij = zij-boxl*nint(zij/boxl)
 
                 rij = norm2([xij, yij, zij])
-                
+
                 if (rij < rc) then
                     if (rij < bpot) then
                         call potential(rij, uij)

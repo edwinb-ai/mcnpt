@@ -38,21 +38,19 @@ contains
 
     subroutine sq(x, y, z, s, pbc)
     real(dp), intent(in) :: x(:), y(:), z(:)
-    real(dp), intent(inout) :: s(:)
     integer, intent(in) :: pbc
-
+    real(dp), intent(inout) :: s(:)
+    
     ! Local variables
     real(dp) :: auxc(nvq), auxs(nvq)
-    integer :: i, kq, k, j
+    integer :: i, k, j
     real(dp) :: xaux, yaux, zaux, rij, arg, sum, parti, auxsq
 
     do i = 2, mr
-        do kq = 1, nvq
-            auxc(kq) = 0._dp
-            auxs(kq) = 0._dp
-        end do
+        auxc = 0.0_dp
+        auxs = 0.0_dp
 
-        parti = 0._dp
+        parti = 0.0_dp
         do k = 1, np
             if (pbc == 1) then
                 xaux = x(k)-boxl*nint(x(k)/boxl)
@@ -66,23 +64,23 @@ contains
             rij = norm2([xaux, yaux, zaux])
 
             if (rij < rc) then
-                parti = parti+1._dp
+                parti = parti + 1.0_dp
 
                 do j = 1, nvq
-                arg = qx(i, j)*xaux+qy(i, j)*yaux+qz(i, j)*zaux
-                auxc(j) = auxc(j)+dcos(arg)
-                auxs(j) = auxs(j)+dsin(arg)
+                arg = qx(i,j)*xaux + qy(i,j)*yaux + qz(i,j)*zaux
+                auxc(j) = auxc(j) + cos(arg)
+                auxs(j) = auxs(j) + sin(arg)
                 end do
             end if
         end do
 
-        sum = 0._dp
-        do kq = 1, nvq
-            sum = sum+auxc(kq)*auxc(kq)+auxs(kq)*auxs(kq)
+        sum = 0.0_dp
+        do j = 1, nvq
+            sum = sum + auxc(j)**2 + auxs(j)**2
         end do
 
-        auxsq = sum/(nvq*parti)
-        s(i) = s(i)+auxsq
+        auxsq = sum / (nvq * parti)
+        s(i) = s(i) + auxsq
     end do
     end subroutine sq
 end module observables
