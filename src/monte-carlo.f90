@@ -21,21 +21,21 @@ program main
     integer :: pbc = 1
 
     ! Read an input file that contains all the necessary information
-    open (newunit=u, file='input.in', status='old')
-    read (u, *) phi, np, nvq, mr, limG
-    close (u)
+    open(newunit=u, file='input.in', status='old')
+    read(u, *) phi, np, nvq, mr, limG
+    close(u)
     ! Update the simulation parameters with this information
     rho = 6.0_dp*real(phi)/pi
-    boxl = (np/rho)**(1._dp/3._dp)
-    rc = boxl/2.0_dp
-    d = (1.0_dp/rho)**(1._dp/3._dp)
-    dr = rc/mr
-    dq = pi/rc
+    boxl = (np / rho)**(1.0_dp/3.0_dp)
+    rc = boxl / 2.0_dp
+    d = (1.0_dp/rho)**(1.0_dp/3.0_dp)
+    dr = rc / mr
+    dq = pi / rc
 
     print*, 'rc = ', rc
     print*, 'dr = ', dr
     print*, 'dq = ', dq, 'boxl =', boxl
-    print*, 'Mean interparticle distance: ', rho**(-1./3.)
+    print*, 'Mean interparticle distance: ', d
 
     ! Allocate memory for arrays
     allocate(x(np), y(np), z(np))
@@ -117,7 +117,7 @@ program main
     open(newunit=u, file = 'gr.dat', status = 'unknown')
     do i = 2, mr
         r(i) = (i-1)*dr
-        dv = (4._dp*pi*r(i)**2._dp*dr)*rho
+        dv = (4.0_dp * pi * r(i)**2 * dr) * rho
         g(i) = g(i) / (np*naveg*dv)
         write(u, '(2f15.8)') r(i), g(i)
     end do
@@ -126,8 +126,8 @@ program main
     ! This is the structure factor from the definition
     open(newunit=u, file = 'sq.dat', status = 'unknown')
     do i = 3, mr
-        s(i) = s(i)/naveg
-        if (q(i) < 40._dp) then
+        s(i) = s(i) / naveg
+        if (q(i) < 40.0_dp) then
             write(u, '(2f15.7)') q(i), s(i)
         end if
     end do
