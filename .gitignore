@@ -3,3 +3,5 @@ build/
 *.mod
 p*
 *.py
+*.sif
+*.def
