@@ -91,7 +91,7 @@ contains
         real(dp), intent(in) :: rij
         real(dp) :: rinf
 
-        if (rij < lambda) then
+        if (rij < 1.0_dp) then
             uij = ieee_value(rinf, ieee_positive_inf)
         else
             uij = 0.0_dp
