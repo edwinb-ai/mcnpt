@@ -4,7 +4,7 @@ module energies
     use parameters
     implicit none
     save
-    public energy, denergy, pseudohs, squarewell
+    public energy, denergy, pseudohs, hardsphere
 contains
     ! This configuration calculates the energy of a given configuration
     subroutine energy(x, y, z, ener)
