@@ -1,9 +1,10 @@
 module energies
+    use ieee_arithmetic, only: ieee_positive_inf, ieee_value
     use types, only: dp
     use parameters
     implicit none
     save
-    public energy, denergy, potential
+    public energy, denergy, pseudohs, squarewell
 contains
     ! This configuration calculates the energy of a given configuration
     subroutine energy(x, y, z, ener)
@@ -12,7 +13,7 @@ contains
 
         ! Local variables
         integer :: i, j
-        real(dp) :: rij, xij, yij, zij, dB, uij
+        real(dp) :: rij, xij, yij, zij, uij
         
         ener = 0._dp
 
@@ -31,11 +32,8 @@ contains
                 rij = norm2([xij, yij, zij])
 
                 if (rij < rc) then
-                    if (rij < bpot) then
-                        call potential(rij, uij)
-                    else
-                        uij = 0._dp
-                    end if
+                    ! call pseudohs(rij, uij)
+                    call hardsphere(rij, uij)
                     ener = ener + uij
                 end if
             end do
@@ -49,7 +47,7 @@ contains
         integer, intent(in) :: no
         ! Local variables
         integer :: i
-        real(dp) :: rij, xij, yij, zij, dB, uij
+        real(dp) :: rij, xij, yij, zij, uij
 
         dener = 0._dp ! initializing
         do i = 1, np
@@ -67,25 +65,37 @@ contains
             rij = norm2([xij, yij, zij])
 
             if (rij < rc) then
-                if (rij < bpot) then
-                    call potential(rij, uij)
-                else
-                    uij = 0._dp
-                end if
+                call hardsphere(rij, uij)
+                ! call pseudohs(rij, uij)
                 dener = dener + uij
             end if
         end do
     end subroutine denergy
 
     ! This configuration calculates the pair potential between particles i & j
-    subroutine potential(rij, uij)
+    subroutine pseudohs(rij, uij)
         real(dp), intent(inout) :: uij
         real(dp), intent(in) :: rij
-        ! Local
-        real(dp) :: dA
 
-        uij = (a2/dT)*((1._dp/rij)**dlr-(1._dp/rij)**dla)
-       uij = uij + 1._dp/dT
+        if (rij < bpot) then
+            uij = (a2/dT)*((1._dp/rij)**dlr-(1._dp/rij)**dla)
+            uij = uij + 1._dp/dT
+        else
+            uij = 0.0_dp
+        end if
 
-    end subroutine potential
+    end subroutine pseudohs
+
+    subroutine hardsphere(rij, uij)
+        real(dp), intent(inout) :: uij
+        real(dp), intent(in) :: rij
+        real(dp) :: rinf
+
+        if (rij < lambda) then
+            uij = ieee_value(rinf, ieee_positive_inf)
+        else
+            uij = 0.0_dp
+        end if
+
+    end subroutine hardsphere
 end module energies
