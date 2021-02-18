@@ -32,8 +32,7 @@ contains
                 rij = norm2([xij, yij, zij])
 
                 if (rij < rc) then
-                    call softsphere(rij, uij, 8)
-                    ! call yukawa_attr(rij, uij, 2.5)
+                    call yukawa_attr(rij, uij, 2.5_dp)
                     ener = ener + uij
                 end if
             end do
@@ -65,8 +64,7 @@ contains
             rij = norm2([xij, yij, zij])
 
             if (rij < rc) then
-                call softsphere(rij, uij, 8)
-                ! call yukawa_attr(rij, uij, 2.5)
+                call yukawa_attr(rij, uij, 2.5_dp)
                 dener = dener + uij
             end if
         end do
@@ -133,7 +131,7 @@ contains
         if (rij < 1.0) then
             uij = ieee_value(rinf, ieee_positive_inf)
         else
-            uij = (1.0_dp / rij) * exp(-k * (rij - 1.0_dp))
+            uij = -(1.0_dp / rij) * exp(-k * (rij - 1.0_dp))
         end if
 
     end subroutine yukawa_attr
