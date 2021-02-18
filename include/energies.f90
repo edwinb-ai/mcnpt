@@ -32,7 +32,7 @@ contains
                 rij = norm2([xij, yij, zij])
 
                 if (rij < rc) then
-                    call gaussian(rij, uij)
+                    call hertzian(rij, uij)
                     ener = ener + uij
                 end if
             end do
@@ -64,7 +64,7 @@ contains
             rij = norm2([xij, yij, zij])
 
             if (rij < rc) then
-                call gaussian(rij, uij)
+                call hertzian(rij, uij)
                 dener = dener + uij
             end if
         end do
@@ -142,4 +142,16 @@ contains
 
         uij = exp(-0.5_dp * rij**2)
     end subroutine gaussian
+
+    subroutine hertzian(rij, uij)
+        real(dp), intent(inout) :: uij
+        real(dp), intent(in) :: rij
+
+        if (rij < 1.0_dp) then
+            uij = (1.0_dp - rij)**(5.0_dp / 2.0_dp)
+        else
+            uij = 0.0_dp
+        end if
+
+    end subroutine hertzian
 end module energies

@@ -124,7 +124,7 @@ contains
 
         if (mod(nattemp, nacc) == 0) then
             ratio = real(nacc, dp)/real(nattemp, dp)
-            if (ratio > 0.5) then
+            if (ratio > 0.5_dp) then
                 del = del*1.05_dp
             else
                 del = del*0.95_dp
