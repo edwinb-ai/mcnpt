@@ -32,7 +32,7 @@ contains
                 rij = norm2([xij, yij, zij])
 
                 if (rij < rc) then
-                    call yukawa_attr(rij, uij, 3.5_dp)
+                    call gaussian(rij, uij)
                     ener = ener + uij
                 end if
             end do
@@ -64,7 +64,7 @@ contains
             rij = norm2([xij, yij, zij])
 
             if (rij < rc) then
-                call yukawa_attr(rij, uij, 3.5_dp)
+                call gaussian(rij, uij)
                 dener = dener + uij
             end if
         end do
@@ -135,4 +135,11 @@ contains
         end if
 
     end subroutine yukawa_attr
+
+    subroutine gaussian(rij, uij)
+        real(dp), intent(inout) :: uij
+        real(dp), intent(in) :: rij
+
+        uij = exp(-0.5_dp * rij**2)
+    end subroutine gaussian
 end module energies
