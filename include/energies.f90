@@ -133,7 +133,7 @@ contains
         if (rij < 1.0) then
             uij = ieee_value(rinf, ieee_positive_inf)
         else
-            uij = (1.0_dp / rij) * exp((rij - 1.0_dp) * -k)
+            uij = (1.0_dp / rij) * exp(-k * (rij - 1.0_dp))
         end if
 
     end subroutine yukawa_attr
