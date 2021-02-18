@@ -114,7 +114,11 @@ contains
         real(dp), intent(in) :: rij
         integer, intent(in) :: n
 
-        uij = (1.0_dp / rij)**n
+        if (rij <= 1.0) then
+            uij = (1.0_dp / rij)**n
+        else
+            uij = 0.0_dp
+        end if
 
     end subroutine softsphere
 end module energies
