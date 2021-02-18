@@ -32,9 +32,7 @@ contains
                 rij = norm2([xij, yij, zij])
 
                 if (rij < rc) then
-                    ! call pseudohs(rij, uij)
-                    ! call hardsphere(rij, uij)
-                    call lennardjones(rij, uij)
+                    call softsphere(rij, uij, 4)
                     ener = ener + uij
                 end if
             end do
@@ -66,9 +64,7 @@ contains
             rij = norm2([xij, yij, zij])
 
             if (rij < rc) then
-                ! call hardsphere(rij, uij)
-                ! call pseudohs(rij, uij)
-                call lennardjones(rij, uij)
+                call softsphere(rij, uij, 4)
                 dener = dener + uij
             end if
         end do
@@ -112,4 +108,13 @@ contains
         uij = 4.0_dp * (temp**2 - temp)
         
     end subroutine lennardjones
+
+    subroutine softsphere(rij, uij, n)
+        real(dp), intent(inout) :: uij
+        real(dp), intent(in) :: rij
+        integer, intent(in) :: n
+
+        uij = (1.0_dp / rij)**n
+
+    end subroutine softsphere
 end module energies
