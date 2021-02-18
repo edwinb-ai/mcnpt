@@ -4,7 +4,7 @@ module energies
     use parameters
     implicit none
     save
-    public energy, denergy, pseudohs, hardsphere
+    public energy, denergy
 contains
     ! This configuration calculates the energy of a given configuration
     subroutine energy(x, y, z, ener)
@@ -33,7 +33,8 @@ contains
 
                 if (rij < rc) then
                     ! call pseudohs(rij, uij)
-                    call hardsphere(rij, uij)
+                    ! call hardsphere(rij, uij)
+                    call lennardjones(rij, uij)
                     ener = ener + uij
                 end if
             end do
@@ -65,8 +66,9 @@ contains
             rij = norm2([xij, yij, zij])
 
             if (rij < rc) then
-                call hardsphere(rij, uij)
+                ! call hardsphere(rij, uij)
                 ! call pseudohs(rij, uij)
+                call lennardjones(rij, uij)
                 dener = dener + uij
             end if
         end do
@@ -98,4 +100,16 @@ contains
         end if
 
     end subroutine hardsphere
+
+    subroutine lennardjones(rij, uij)
+        real(dp), intent(inout) :: uij
+        real(dp), intent(in) :: rij
+
+        real(dp) :: temp
+
+        temp = (1.0_dp / rij)**6
+
+        uij = 4.0_dp * (temp**2 - temp)
+        
+    end subroutine lennardjones
 end module energies
