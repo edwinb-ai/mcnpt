@@ -32,7 +32,7 @@ contains
                 rij = norm2([xij, yij, zij])
 
                 if (rij < rc) then
-                    call yukawa_attr(rij, uij, 2.5_dp)
+                    call yukawa_attr(rij, uij, 3.5_dp)
                     ener = ener + uij
                 end if
             end do
@@ -64,7 +64,7 @@ contains
             rij = norm2([xij, yij, zij])
 
             if (rij < rc) then
-                call yukawa_attr(rij, uij, 2.5_dp)
+                call yukawa_attr(rij, uij, 3.5_dp)
                 dener = dener + uij
             end if
         end do
