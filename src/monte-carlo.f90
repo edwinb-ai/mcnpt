@@ -15,7 +15,7 @@ program main
     integer :: nattemp = 0
     integer :: nacc = 1, nacco, nav, i, j, ncq = 0
     integer :: ng = 0, naveg = 0
-    integer, parameter :: limT = 6000000
+    integer, parameter :: limT = 8000000
     integer :: limG, u
     ! Condiciones periódicas a la frontera
     integer :: pbc = 1
@@ -27,7 +27,7 @@ program main
     ! Update the simulation parameters with this information
     rho = 6.0_dp*real(phi)/pi
     boxl = (np / rho)**(1.0_dp/3.0_dp)
-    rc = boxl / 2.0_dp
+    rc = boxl * 0.6_dp
     d = (1.0_dp/rho)**(1.0_dp/3.0_dp)
     dr = rc / mr
     dq = pi / rc

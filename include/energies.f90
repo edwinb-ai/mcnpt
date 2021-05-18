@@ -15,7 +15,7 @@ contains
         integer :: i, j
         real(dp) :: rij, xij, yij, zij, uij
         
-        ener = 0._dp
+        ener = 0.0_dp
 
         do i = 1, np - 1
             do j = i + 1, np
@@ -32,7 +32,7 @@ contains
                 rij = norm2([xij, yij, zij])
 
                 if (rij < rc) then
-                    call hertzian(rij, uij)
+                    call pseudohs(rij, uij)
                     ener = ener + uij
                 end if
             end do
@@ -48,7 +48,7 @@ contains
         integer :: i
         real(dp) :: rij, xij, yij, zij, uij
 
-        dener = 0._dp ! initializing
+        dener = 0.0_dp ! initializing
         do i = 1, np
             if ( i == no ) cycle
 
@@ -64,7 +64,7 @@ contains
             rij = norm2([xij, yij, zij])
 
             if (rij < rc) then
-                call hertzian(rij, uij)
+                call pseudohs(rij, uij)
                 dener = dener + uij
             end if
         end do
@@ -76,8 +76,8 @@ contains
         real(dp), intent(in) :: rij
 
         if (rij < bpot) then
-            uij = (a2/dT)*((1._dp/rij)**dlr-(1._dp/rij)**dla)
-            uij = uij + 1._dp/dT
+            uij = (a2/dT)*((1.0_dp/rij)**dlr-(1.0_dp/rij)**dla)
+            uij = uij + 1.0_dp/dT
         else
             uij = 0.0_dp
         end if
