@@ -27,7 +27,7 @@ program main
     ! Update the simulation parameters with this information
     rho = 6.0_dp*real(phi)/pi
     boxl = (np / rho)**(1.0_dp/3.0_dp)
-    rc = boxl * 0.5_dp
+    rc = boxl * 0.65_dp
     d = (1.0_dp/rho)**(1.0_dp/3.0_dp)
     dr = rc / mr
     dq = pi / rc
