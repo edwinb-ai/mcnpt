@@ -2,9 +2,11 @@ module energies
     use ieee_arithmetic, only: ieee_positive_inf, ieee_value
     use types, only: dp
     use parameters
+    
     implicit none
-    save
+    
     public energy, denergy
+
 contains
     ! This configuration calculates the energy of a given configuration
     subroutine energy(x, y, z, ener)

@@ -20,14 +20,14 @@ program main
     ! Condiciones periódicas a la frontera
     integer :: pbc = 1
 
+    ! Inicializar el RNG
+    call random_seed()
     ! Read an input file that contains all the necessary information
-    open(newunit=u, file='input.in', status='old')
-    read(u, *) phi, np, nvq, mr, limG
-    close(u)
+    call parse_input('input.in', limG)
     ! Update the simulation parameters with this information
     rho = 6.0_dp*real(phi)/pi
     boxl = (np / rho)**(1.0_dp/3.0_dp)
-    rc = boxl * 0.65_dp
+    rc = boxl * 0.5_dp
     d = (1.0_dp/rho)**(1.0_dp/3.0_dp)
     dr = rc / mr
     dq = pi / rc

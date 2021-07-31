@@ -1,9 +1,11 @@
 module utils
-    use types, only: dp
-    use parameters, only: np, rc, boxl
+    use types
+    use parameters
+
     implicit none
-    save
-    public iniconfig
+
+    public iniconfig, parse_input
+
 contains
     subroutine iniconfig(x, y, z, d)
     ! defining three vector of mp dimension, it indicate that only are out variables
@@ -38,4 +40,24 @@ contains
             end if
         end do
     end subroutine iniconfig ! note that the out is x, y, z vector
+
+    subroutine parse_input(filein, limg)
+        character(len = *), intent(in) :: filein
+        integer, intent(inout) :: limg
+
+        ! Variables locales
+        integer :: u
+
+        open(newunit=u, file=filein, status='old')
+        ! Leer todas las variables
+        read(u, *) phi
+        read(u, *) ktemp
+        read(u, *) np
+        read(u, *) nvq
+        read(u, *) mr
+        read(u, *) limg
+
+        close(u)
+        
+    end subroutine parse_input
 end module utils

@@ -3,8 +3,9 @@ module movement
     use parameters
     use energies, only: denergy
     use observables, only: rdf, sq
+
     implicit none
-    save
+
     public mcmove, adjust, average
 contains
     ! This subroutine displace the system to a new configuration
@@ -46,7 +47,7 @@ contains
 
     dener = enern-enero
     call random_number(rng)
-    if ( rng < exp(-dener)) then
+    if ( rng < exp(-dener / ktemp)) then
         ener = ener+dener
         nacc = nacc+1
     else
@@ -98,7 +99,7 @@ contains
     dener = enern-enero
 
     call random_number(rng)
-    if (rng < exp(-dener)) then
+    if (rng < exp(-dener / ktemp)) then
         ener = ener + dener
         nacc = nacc + 1
         ng = ng + 1
