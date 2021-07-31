@@ -21,13 +21,6 @@ endif()
 set(CMAKE_Fortran_FLAGS_DEBUG "${CMAKE_Fortran_FLAGS_DEBUG} ${bounds}")
 set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} ${dialect}")
 
-# For OpenMP
-find_package(OpenMP REQUIRED)
-if(OPENMP_FOUND)
-message("OPENMP FOUND")
-set(CMAKE_Fortran_FLAGS "${OpenMP_Fortran_FLAGS} ${dialect}")
-endif()
-
 #
 # Compilar
 #
