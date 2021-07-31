@@ -118,6 +118,7 @@ program main
     !MC cycle to calculate the g(r)
     nacco = nacc
     vacco = vacc
+    vacc = 0
     g = 0.0_dp
 
     open(newunit = u, file = 'density.dat', status = 'unknown')
@@ -131,8 +132,8 @@ program main
             call mcvolume(x, y, z, rhoave, vattemp, vacc, del)
             print*, 'MC Step, Density average, box size, Vol ratio'
             volratio = real(vacc, dp) / real(vattemp, dp)
-            print*, i, rhoave / (vacc - vacco), boxl, volratio
-            write(u, *) i, rhoave / (vacc - vacco)
+            print*, i, rhoave / vacc, boxl, volratio
+            write(u, *) i, rhoave / vacc
         end if
 
         if (mod(i, 100000) == 0) print*, i, 'calculating g(r) and S(q)'
@@ -142,7 +143,7 @@ program main
     nav = nacc-nacco
 
     print*,'Average number for energy: ', nav
-    print*,'Average value of density: ', rhoave / (vacc - vacco)
+    print*,'Average value of density: ', rhoave / (vacc + vacco)
     print*,'Average number for g(r): ', naveg
 
     ! This is the radial distribution function
