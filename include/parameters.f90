@@ -14,7 +14,7 @@ module parameters
     real(dp), parameter :: diam = 1.0_dp
 
     ! User dependant parameters
-    real(dp) :: phi, rho, boxl, rc, ktemp
+    real(dp) :: phi, rho, boxl, rc, ktemp, pressure
     integer :: np, nvq, mr
     real(dp), allocatable :: qx(:, :), qy(:, :), qz(:, :)
 end module parameters

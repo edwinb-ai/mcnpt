@@ -52,11 +52,11 @@ contains
         ! Leer todas las variables
         read(u, *) phi
         read(u, *) ktemp
+        read(u, *) pressure
         read(u, *) np
         read(u, *) nvq
         read(u, *) mr
         read(u, *) limg
-
         close(u)
         
     end subroutine parse_input

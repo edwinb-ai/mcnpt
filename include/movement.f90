@@ -39,15 +39,15 @@ contains
     z(no) = z(no)+(rng-0.5_dp)*del
 
     ! periodic boundary conditions
-    x(no) = x(no)-boxl*dnint(x(no)/boxl) ! dnint -> Nearest integer
-    y(no) = y(no)-boxl*dnint(y(no)/boxl) !introduzco la energia calculada para esa conf
+    x(no) = x(no)-boxl*dnint(x(no)/boxl)
+    y(no) = y(no)-boxl*dnint(y(no)/boxl)
     z(no) = z(no)-boxl*dnint(z(no)/boxl)
 
     call denergy(x, y, z, no, enern)
 
     dener = enern-enero
     call random_number(rng)
-    if ( rng < exp(-dener / ktemp)) then
+    if (rng < exp(-dener / ktemp)) then
         ener = ener+dener
         nacc = nacc+1
     else
@@ -55,7 +55,7 @@ contains
         y(no) = yo
         z(no) = zo
     end if
-    end subroutine mcmove ! the out is  ener, nattemp, nacc
+    end subroutine mcmove
 
     subroutine average(x, y, z, g, s, ener, nattemp, nacc, ng, naveg, del, dr, pbc)
     real(dp), intent(inout) :: x(:), y(:), z(:)
@@ -115,6 +115,79 @@ contains
         z(no) = zo
     end if
     end subroutine average
+
+    subroutine mcvolume(x, y, z, ener, nattemp, nacc, del)
+    real(dp), intent(in) :: del
+    real(dp), intent(inout) :: ener
+    integer, intent(inout) :: nattemp, nacc
+    real(dp), intent(inout) :: x(:), y(:), z(:)
+
+    ! Local variables
+    integer :: no, i
+    real(dp) :: xo, yo, zo, enero, enern, dener
+    real(dp) :: rng, volold, volnew, lnvolold, lnvolnew
+    real(dp) :: adjust, dispvol, boxlnew, rhold, denpt
+
+    ! Estimate the new volume
+    dispvol = 0.001
+    volold = boxl**3
+    lnvolold = log(volold)
+    call random_number(rng)
+    lnvolnew = lnvolold + dispvol * (rng - 0.5_dp)
+    boxlnew = exp(lnvolnew)**(1.0_dp / 3.0_dp)
+
+    ! Adjust the particles to the new box
+    adjust = boxlnew / boxl
+    boxl = boxlnew
+    do i = 1, np
+        x(i) = x(i) * adjust
+        y(i) = y(i) * adjust
+        z(i) = z(i) * adjust
+    end do
+
+    ! Compute the new density
+    rhold = rho
+    rho = np / volnew
+
+    nattemp = nattemp + 1
+
+    call random_number(rng)
+    no = int(rng*np) + 1
+    call denergy(x, y, z, no, enero)
+
+    xo = x(no)
+    yo = y(no)
+    zo = z(no)
+
+    call random_number(rng)
+    x(no) = x(no)+(rng-0.5_dp)*del
+    call random_number(rng)
+    y(no) = y(no)+(rng-0.5_dp)*del
+    call random_number(rng)
+    z(no) = z(no)+(rng-0.5_dp)*del
+
+    ! periodic boundary conditions
+    x(no) = x(no)-boxl*dnint(x(no)/boxl)
+    y(no) = y(no)-boxl*dnint(y(no)/boxl)
+    z(no) = z(no)-boxl*dnint(z(no)/boxl)
+
+    ! Compute the full energy
+    call denergy(x, y, z, no, enern)
+    dener = enern-enero
+    denpt = pressure * (volnew - volold) + dener
+    denpt = denpt + (3.0_dp * np + 4.0_dp) * log(adjust) * ktemp
+
+    ! Apply Metropolis criteria
+    call random_number(rng)
+    if (rng < exp(-denpt / ktemp)) then
+        ener = ener+dener
+        nacc = nacc+1
+    else
+        x(no) = xo
+        y(no) = yo
+        z(no) = zo
+    end if
+    end subroutine mcvolume
 
     ! This subroutine adjusts the displacement of particles
     subroutine adjust(nattemp, nacc, del)
