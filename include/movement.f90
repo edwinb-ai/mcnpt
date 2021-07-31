@@ -116,9 +116,9 @@ contains
     end if
     end subroutine average
 
-    subroutine mcvolume(x, y, z, ener, rhoave, vattemp, vacc, del)
+    subroutine mcvolume(x, y, z, rhoave, vattemp, vacc, del)
     real(dp), intent(in) :: del
-    real(dp), intent(inout) :: ener, rhoave
+    real(dp), intent(inout) :: rhoave
     integer, intent(inout) :: vattemp, vacc
     real(dp), intent(inout) :: x(:), y(:), z(:)
 
@@ -126,13 +126,12 @@ contains
     integer :: i
     real(dp) :: xo, yo, zo, enero, enern, dener 
     real(dp) :: rng, volold, volnew, lnvolold, lnvolnew
-    real(dp) :: adjust, dispvol, boxlnew, rhold, denpt
+    real(dp) :: adjust, boxlnew, rhold, denpt
 
     ! Count as a movement always
     vattemp = vattemp + 1
 
     ! Estimate the new volume
-    dispvol = 0.001
     volold = boxl**3
     lnvolold = log(volold)
     call random_number(rng)

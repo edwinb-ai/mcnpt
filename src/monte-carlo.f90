@@ -89,7 +89,8 @@ program main
 
         ! Adjust the box if asked for
         if ((nptvol == 1) .and. (mod(i, nptvolfreq)) == 0) then
-            call mcvolume(x, y, z, ener, rhoave, vattemp, vacc, del)
+            call mcvolume(x, y, z, rhoave, vattemp, vacc, del)
+            print*, vattemp, vacc
         end if
         
         if (mod(i, 100) == 0) then
