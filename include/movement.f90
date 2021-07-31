@@ -154,17 +154,9 @@ contains
     call random_number(rng)
     no = int(rng*np) + 1
     call denergy(x, y, z, no, enero)
-
     xo = x(no)
     yo = y(no)
     zo = z(no)
-
-    call random_number(rng)
-    x(no) = x(no)+(rng-0.5_dp)*del
-    call random_number(rng)
-    y(no) = y(no)+(rng-0.5_dp)*del
-    call random_number(rng)
-    z(no) = z(no)+(rng-0.5_dp)*del
 
     ! periodic boundary conditions
     x(no) = x(no)-boxl*dnint(x(no)/boxl)
@@ -194,6 +186,7 @@ contains
         end do
 
         boxl = volold**(1/3)
+        rho = rhold
     end if
     end subroutine mcvolume
 
