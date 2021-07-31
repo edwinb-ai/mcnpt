@@ -116,8 +116,8 @@ contains
     end if
     end subroutine average
 
-    subroutine mcvolume(x, y, z, rhoave, vattemp, vacc, del)
-    real(dp), intent(in) :: del
+    subroutine mcvolume(x, y, z, rhoave, ener, vattemp, vacc, del)
+    real(dp), intent(in) :: del, ener
     real(dp), intent(inout) :: rhoave
     integer, intent(inout) :: vattemp, vacc
     real(dp), intent(inout) :: x(:), y(:), z(:)
@@ -139,9 +139,6 @@ contains
     volnew = exp(lnvolnew)
     boxlnew = volnew**(1.0_dp / 3.0_dp)
 
-    ! Compute the energy before adjusting the box
-    call energy(x, y, z, enero)
-
     ! Adjust the particles to the new box
     adjust = boxlnew / boxl
     boxl = boxlnew
@@ -158,7 +155,7 @@ contains
 
     ! Compute the energy after adjusting the box
     call energy(x, y, z, enern)
-    dener = enern - enero
+    dener = enern - ener
     ! Compute the full exponential term for the NPT ensemble
     denpt = pressure * (volnew - volold) + dener
     denpt = denpt - (np + 1) * (lnvolnew - lnvolold) * ktemp

@@ -90,7 +90,7 @@ program main
 
         ! Adjust the box if asked for
         if ((nptvol == 1) .and. (mod(i, nptvolfreq)) == 0) then
-            call mcvolume(x, y, z, rhoave, vattemp, vacc, del)
+            call mcvolume(x, y, z, rhoave, ener, vattemp, vacc, del)
         end if
         
         if (mod(i, 100) == 0) then
@@ -129,7 +129,7 @@ program main
         
         ! Adjust the box if asked for
         if ((nptvol == 1) .and. (mod(i, nptvolfreq)) == 0) then
-            call mcvolume(x, y, z, rhoave, vattemp, vacc, del)
+            call mcvolume(x, y, z, rhoave, ener, vattemp, vacc, del)
             print*, 'MC Step, Density average, box size, Vol ratio'
             volratio = real(vacc, dp) / real(vattemp, dp)
             print*, i, rhoave / vacc, boxl, volratio
