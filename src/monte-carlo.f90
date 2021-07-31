@@ -7,16 +7,16 @@ program main
 
     implicit none
 
-    ! Local variables, note that somes variables was initialized
+    ! Local variables, note that somes variables are initialized
     real(dp), allocatable :: x(:), y(:), z(:)
     real(dp), allocatable :: r(:), g(:), q(:), s(:)
-    real(dp) :: del = 0.1_dp, ener , dv, dt2, dphi, sumq, qs
-    real(dp) :: rng, d, dr, dq
+    real(dp) :: del = 0.1_dp, ener, dv, dt2, dphi, sumq, qs
+    real(dp) :: rng, d, dr, dq, rhoave
     integer :: nattemp = 0
     integer :: nacc = 1, nacco, nav, i, j, ncq = 0
     integer :: ng = 0, naveg = 0
-    integer, parameter :: limT = 10000000
-    integer :: limG, u
+    integer, parameter :: limT = 1000000000
+    integer :: limG, u, nptvol, nptvolfreq, vacc, vattemp
     ! Condiciones periódicas a la frontera
     integer :: pbc = 1
 
@@ -25,17 +25,24 @@ program main
     ! Read an input file that contains all the necessary information
     call parse_input('input.in', limG)
     ! Update the simulation parameters with this information
-    rho = 6.0_dp*real(phi)/pi
+    rho = 6.0_dp * real(phi) / pi
     boxl = (np / rho)**(1.0_dp/3.0_dp)
     rc = boxl * 0.5_dp
     d = (1.0_dp/rho)**(1.0_dp/3.0_dp)
     dr = rc / mr
     dq = pi / rc
+    nptvolfreq = np * 2
+    rhoave = 0.0_dp
+    nptvol = 1
+    vacc = 1
+    vattemp = 0
 
     print*, 'rc = ', rc
     print*, 'dr = ', dr
     print*, 'dq = ', dq, 'boxl =', boxl
     print*, 'Mean interparticle distance: ', d
+    print*, 'Pressure = ', pressure
+    print*, 'Reference density = ', rho
 
     ! Allocate memory for arrays
     allocate(x(np), y(np), z(np))
@@ -79,15 +86,25 @@ program main
     do i = 1, limT
         call mcmove(x, y, z, ener, nattemp, nacc, del)
         call adjust(nattemp, nacc, del)
+
+        ! Adjust the box if asked for
+        if ((nptvol == 1) .and. (mod(i, nptvolfreq)) == 0) then
+            call mcvolume(x, y, z, ener, rhoave, vattemp, vacc, del)
+        end if
         
         if (mod(i, 100) == 0) then
             write(u, '(2f15.7)') i*1._dp, ener/np
         end if
         
         if (mod(i, 500000) == 0) then
-            print*, i, del, ener/np
+            print*, 'MC Step, Energy / N'
+            print*, i, ener/np
+            print*, 'MC Step, Density average, box size, Vol ratio'
+            print*, i, rhoave / vacc, boxl, vacc / vattemp
         end if
     end do
+
+    stop "End of program"
 
     print*, 'The system has thermalized'
     close(u)

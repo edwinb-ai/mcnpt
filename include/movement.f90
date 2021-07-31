@@ -1,12 +1,12 @@
 module movement
-    use types, only: dp
+    use types
     use parameters
-    use energies, only: denergy
+    use energies
     use observables, only: rdf, sq
 
     implicit none
 
-    public mcmove, adjust, average
+    public mcmove, adjust, average, mcvolume, volaverage
 contains
     ! This subroutine displace the system to a new configuration
     subroutine mcmove(x, y, z, ener, nattemp, nacc, del)
@@ -116,32 +116,37 @@ contains
     end if
     end subroutine average
 
-    subroutine mcvolume(x, y, z, ener, nattemp, nacc, del)
+    subroutine mcvolume(x, y, z, ener, rhoave, vattemp, vacc, del)
     real(dp), intent(in) :: del
-    real(dp), intent(inout) :: ener
-    integer, intent(inout) :: nattemp, nacc
+    real(dp), intent(inout) :: ener, rhoave
+    integer, intent(inout) :: vattemp, vacc
     real(dp), intent(inout) :: x(:), y(:), z(:)
 
     ! Local variables
-    integer :: no, i
-    real(dp) :: xo, yo, zo, enero, enern, dener
+    integer :: i
+    real(dp) :: xo, yo, zo, enero, enern, dener 
     real(dp) :: rng, volold, volnew, lnvolold, lnvolnew
     real(dp) :: adjust, dispvol, boxlnew, rhold, denpt
 
     ! Count as a movement always
-    nattemp = nattemp + 1
+    vattemp = vattemp + 1
 
     ! Estimate the new volume
     dispvol = 0.001
     volold = boxl**3
     lnvolold = log(volold)
     call random_number(rng)
-    lnvolnew = lnvolold + dispvol * (rng - 0.5_dp)
-    boxlnew = exp(lnvolnew)**(1.0_dp / 3.0_dp)
+    lnvolnew = lnvolold + (dispvol * (rng - 0.5_dp))
+    volnew = exp(lnvolnew)
+    boxlnew = volnew**(1.0_dp / 3.0_dp)
+
+    ! Compute the energy before adjusting the box
+    call energy(x, y, z, enero)
 
     ! Adjust the particles to the new box
     adjust = boxlnew / boxl
     boxl = boxlnew
+    rc = boxl / 2.0_dp
     do i = 1, np
         x(i) = x(i) * adjust
         y(i) = y(i) * adjust
@@ -152,42 +157,28 @@ contains
     rhold = rho
     rho = np / volnew
 
-    call random_number(rng)
-    no = int(rng*np) + 1
-    call denergy(x, y, z, no, enero)
-    xo = x(no)
-    yo = y(no)
-    zo = z(no)
-
-    ! periodic boundary conditions
-    x(no) = x(no)-boxl*dnint(x(no)/boxl)
-    y(no) = y(no)-boxl*dnint(y(no)/boxl)
-    z(no) = z(no)-boxl*dnint(z(no)/boxl)
-
-    ! Compute the full energy
-    call denergy(x, y, z, no, enern)
+    ! Compute the energy after adjusting the box
+    call energy(x, y, z, enern)
     dener = enern - enero
+    ! Compute the full exponential term for the NPT ensemble
     denpt = pressure * (volnew - volold) + dener
-    denpt = denpt + (np + 1) * (lnvolnew - lnvolold)
+    denpt = denpt - (np + 1) * (lnvolnew - lnvolold)
 
     ! Apply Metropolis criteria
     call random_number(rng)
     if (rng <= exp(-denpt / ktemp)) then
-        ener = ener + dener
-        nacc = nacc + 1
+        rhoave = rhoave + rho
+        vacc = vacc + 1
     else
-        x(no) = xo
-        y(no) = yo
-        z(no) = zo
-
         do i = 1, np
             x(i) = x(i) / adjust
             y(i) = y(i) / adjust
             z(i) = z(i) / adjust
         end do
 
-        boxl = volold**(1/3)
+        boxl = volold**(1.0_dp / 3.0_dp)
         rho = rhold
+        rc = boxl / 2.0_dp
     end if
     end subroutine mcvolume
 
@@ -246,7 +237,7 @@ contains
     call denergy(x, y, z, no, enern)
     dener = enern - enero
     denpt = pressure * (volnew - volold) + dener
-    denpt = denpt + (np + 1) * (lnvolnew - lnvolold)
+    denpt = denpt - (np + 1) * (lnvolnew - lnvolold) * ktemp
 
     ! Apply Metropolis criteria
     call random_number(rng)
