@@ -99,11 +99,11 @@ program main
         end if
         
         if (mod(i, 500000) == 0) then
-            print*, 'MC Step, Energy / N'
-            print*, i, ener/np
-            print*, 'MC Step, Density average, box size, Vol ratio'
+            print*, 'MC Step, Particle disp, Energy / N'
+            print*, i, del, ener/np
+            print*, 'MC Step, Density average, box size, Vol ratio, Vol disp'
             volratio = real(vacc, dp) / real(vattemp, dp)
-            print*, i, rhoave / vacc, boxl, volratio
+            print*, i, rhoave / vacc, boxl, volratio, dispvol
         end if
     end do
 
@@ -119,7 +119,7 @@ program main
     !MC cycle to calculate the g(r)
     nacco = nacc
     vacco = vacc
-    vacc = 0
+    vacc = 1
     g = 0.0_dp
 
     open(newunit = u, file = 'density.dat', status = 'unknown')
