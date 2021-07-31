@@ -6,7 +6,7 @@ module movement
 
     implicit none
 
-    public mcmove, adjust, average, mcvolume, volaverage
+    public mcmove, adjust, average, mcvolume
 contains
     ! This subroutine displace the system to a new configuration
     subroutine mcmove(x, y, z, ener, nattemp, nacc, del)

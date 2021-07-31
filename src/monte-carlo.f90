@@ -15,7 +15,7 @@ program main
     integer :: nattemp = 0
     integer :: nacc = 1, nacco, nav, i, j, ncq = 0
     integer :: ng = 0, naveg = 0
-    integer, parameter :: limT = 1000000000
+    integer, parameter :: limT = 25000000
     integer :: limG, u, nptvol, nptvolfreq, vacc, vattemp
     integer :: vacco
     ! Condiciones periódicas a la frontera
@@ -101,7 +101,7 @@ program main
             print*, 'MC Step, Energy / N'
             print*, i, ener/np
             print*, 'MC Step, Density average, box size, Vol ratio'
-            volratio = vacc / vattemp
+            volratio = real(vacc, dp) / real(vattemp, dp)
             print*, i, rhoave / vacc, boxl, volratio
         end if
     end do
