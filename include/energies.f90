@@ -1,8 +1,7 @@
 module energies
     use ieee_arithmetic, only: ieee_positive_inf, ieee_value
-    use types, only: dp
+    use types
     use parameters
-    use omp_lib
     
     implicit none
     
@@ -17,16 +16,12 @@ contains
         ! Local variables
         integer :: i, j
         real(dp) :: rij, xij, yij, zij, uij
-        integer :: id, hilos
-        integer, external :: omp_get_thread_num, omp_get_max_threads
         
         ener = 0.0_dp
 
-        !$omp parallel private(i,j,rij,xij,yij,zij,id,hilos) reduction(+:ener)
-        id = omp_get_thread_num()
-        hilos = omp_get_max_threads()
-        do i = id, hilos, np - 1
+        do i = 1, np - 1
             do j = i + 1, np
+                uij = 0.0_dp
 
                 xij = x(j)-x(i)
                 yij = y(j)-y(i)
@@ -46,7 +41,6 @@ contains
                 end if
             end do
         end do
-        !$omp end parallel
     end subroutine energy
 
     ! This subroutine calculates the difference in energy when a particle is displaced
