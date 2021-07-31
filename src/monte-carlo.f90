@@ -15,7 +15,7 @@ program main
     integer :: nattemp = 0
     integer :: nacc = 1, nacco, nav, i, j, ncq = 0
     integer :: ng = 0, naveg = 0
-    integer, parameter :: limT = 25000000
+    integer, parameter :: limT = 15000000
     integer :: limG, u, nptvol, nptvolfreq, vacc, vattemp
     integer :: vacco
     ! Condiciones periódicas a la frontera
@@ -120,7 +120,7 @@ program main
     vacco = vacc
     g = 0.0_dp
 
-    open(newunit = u, file = 'density.dat', status = 'new')
+    open(newunit = u, file = 'density.dat', status = 'unknown')
 
     do i = 1, limG
         call average(x, y, z, g, s, ener, nattemp, nacc, ng, naveg, del, dr, pbc)
@@ -129,6 +129,9 @@ program main
         ! Adjust the box if asked for
         if ((nptvol == 1) .and. (mod(i, nptvolfreq)) == 0) then
             call mcvolume(x, y, z, rhoave, vattemp, vacc, del)
+            print*, 'MC Step, Density average, box size, Vol ratio'
+            volratio = real(vacc, dp) / real(vattemp, dp)
+            print*, i, rhoave / (vacc - vacco), boxl, volratio
             write(u, *) i, rhoave / (vacc - vacco)
         end if
 

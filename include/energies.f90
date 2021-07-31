@@ -34,7 +34,8 @@ contains
                 rij = norm2([xij, yij, zij])
 
                 if (rij < rc) then
-                    call pseudohs(rij, uij)
+                    ! call pseudohs(rij, uij)
+                    call hardsphere(rij, uij)
                     ener = ener + uij
                 end if
             end do
@@ -66,7 +67,8 @@ contains
             rij = norm2([xij, yij, zij])
 
             if (rij < rc) then
-                call pseudohs(rij, uij)
+                ! call pseudohs(rij, uij)
+                call hardsphere(rij, uij)
                 dener = dener + uij
             end if
         end do
