@@ -124,7 +124,7 @@ contains
 
     ! Local variables
     integer :: i
-    real(dp) :: xo, yo, zo, enero, enern, dener 
+    real(dp) :: enero, enern, dener 
     real(dp) :: rng, volold, volnew, lnvolold, lnvolnew
     real(dp) :: adjust, boxlnew, rhold, denpt
 
@@ -161,7 +161,7 @@ contains
     dener = enern - enero
     ! Compute the full exponential term for the NPT ensemble
     denpt = pressure * (volnew - volold) + dener
-    denpt = denpt - (np + 1) * (lnvolnew - lnvolold)
+    denpt = denpt - (np + 1) * (lnvolnew - lnvolold) * ktemp
 
     ! Apply Metropolis criteria
     call random_number(rng)
@@ -180,85 +180,6 @@ contains
         rc = boxl / 2.0_dp
     end if
     end subroutine mcvolume
-
-    subroutine volaverage(x, y, z, g, s, ener, rhoave, nattemp, &
-    nacc, ng, naveg, del, dr, pbc)
-    real(dp), intent(inout) :: x(:), y(:), z(:)
-    real(dp), intent(inout) :: g(:), s(:)
-    real(dp), intent(in) :: del, dr
-    integer, intent(inout) :: nattemp, nacc, naveg, ng
-    real(dp), intent(inout) :: ener, rhoave
-    integer, intent(in) :: pbc
-
-    ! Local variables
-    integer :: no, i
-    real(dp) :: xo, yo, zo, enero, enern, dener
-    real(dp) :: rng, volold, volnew, lnvolold, lnvolnew
-    real(dp) :: adjust, dispvol, boxlnew, rhold, denpt
-
-    ! Count as a movement always
-    nattemp = nattemp + 1
-
-    ! Estimate the new volume
-    dispvol = 0.001
-    volold = boxl**3
-    lnvolold = log(volold)
-    call random_number(rng)
-    lnvolnew = lnvolold + dispvol * (rng - 0.5_dp)
-    boxlnew = exp(lnvolnew)**(1.0_dp / 3.0_dp)
-
-    ! Adjust the particles to the new box
-    adjust = boxlnew / boxl
-    boxl = boxlnew
-    do i = 1, np
-        x(i) = x(i) * adjust
-        y(i) = y(i) * adjust
-        z(i) = z(i) * adjust
-    end do
-
-    ! Compute the new density
-    rhold = rho
-    rho = np / volnew
-
-    call random_number(rng)
-    no = int(rng*np) + 1
-    call denergy(x, y, z, no, enero)
-    xo = x(no)
-    yo = y(no)
-    zo = z(no)
-
-    ! periodic boundary conditions
-    x(no) = x(no)-boxl*dnint(x(no)/boxl)
-    y(no) = y(no)-boxl*dnint(y(no)/boxl)
-    z(no) = z(no)-boxl*dnint(z(no)/boxl)
-
-    ! Compute the full energy
-    call denergy(x, y, z, no, enern)
-    dener = enern - enero
-    denpt = pressure * (volnew - volold) + dener
-    denpt = denpt - (np + 1) * (lnvolnew - lnvolold) * ktemp
-
-    ! Apply Metropolis criteria
-    call random_number(rng)
-    if (rng <= exp(-denpt / ktemp)) then
-        ener = ener + dener
-        rhoave = rhoave + rho
-        nacc = nacc + 1
-    else
-        x(no) = xo
-        y(no) = yo
-        z(no) = zo
-
-        do i = 1, np
-            x(i) = x(i) / adjust
-            y(i) = y(i) / adjust
-            z(i) = z(i) / adjust
-        end do
-
-        boxl = volold**(1/3)
-        rho = rhold
-    end if
-    end subroutine volaverage
 
     ! This subroutine adjusts the displacement of particles
     subroutine adjust(nattemp, nacc, del)

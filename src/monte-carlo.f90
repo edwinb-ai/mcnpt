@@ -11,12 +11,13 @@ program main
     real(dp), allocatable :: x(:), y(:), z(:)
     real(dp), allocatable :: r(:), g(:), q(:), s(:)
     real(dp) :: del = 0.1_dp, ener, dv, dt2, dphi, sumq, qs
-    real(dp) :: rng, d, dr, dq, rhoave
+    real(dp) :: rng, d, dr, dq, rhoave, volratio
     integer :: nattemp = 0
     integer :: nacc = 1, nacco, nav, i, j, ncq = 0
     integer :: ng = 0, naveg = 0
     integer, parameter :: limT = 1000000000
     integer :: limG, u, nptvol, nptvolfreq, vacc, vattemp
+    integer :: vacco
     ! Condiciones periódicas a la frontera
     integer :: pbc = 1
 
@@ -90,7 +91,6 @@ program main
         ! Adjust the box if asked for
         if ((nptvol == 1) .and. (mod(i, nptvolfreq)) == 0) then
             call mcvolume(x, y, z, rhoave, vattemp, vacc, del)
-            print*, vattemp, vacc
         end if
         
         if (mod(i, 100) == 0) then
@@ -101,11 +101,10 @@ program main
             print*, 'MC Step, Energy / N'
             print*, i, ener/np
             print*, 'MC Step, Density average, box size, Vol ratio'
-            print*, i, rhoave / vacc, boxl, vacc / vattemp
+            volratio = vacc / vattemp
+            print*, i, rhoave / vacc, boxl, volratio
         end if
     end do
-
-    stop "End of program"
 
     print*, 'The system has thermalized'
     close(u)
@@ -118,17 +117,29 @@ program main
 
     !MC cycle to calculate the g(r)
     nacco = nacc
+    vacco = vacc
     g = 0.0_dp
+
+    open(newunit = u, file = 'density.dat', status = 'new')
 
     do i = 1, limG
         call average(x, y, z, g, s, ener, nattemp, nacc, ng, naveg, del, dr, pbc)
         call adjust(nattemp, nacc, del)
+        
+        ! Adjust the box if asked for
+        if ((nptvol == 1) .and. (mod(i, nptvolfreq)) == 0) then
+            call mcvolume(x, y, z, rhoave, vattemp, vacc, del)
+            write(u, *) i, rhoave / (vacc - vacco)
+        end if
+
         if (mod(i, 100000) == 0) print*, i, 'calculating g(r) and S(q)'
     end do
 
+    close(u)
     nav = nacc-nacco
 
     print*,'Average number for energy: ', nav
+    print*,'Average value of density: ', rhoave / (vacc - vacco)
     print*,'Average number for g(r): ', naveg
 
     ! This is the radial distribution function
