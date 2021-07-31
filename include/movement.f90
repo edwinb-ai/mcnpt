@@ -128,6 +128,9 @@ contains
     real(dp) :: rng, volold, volnew, lnvolold, lnvolnew
     real(dp) :: adjust, dispvol, boxlnew, rhold, denpt
 
+    ! Count as a movement always
+    nattemp = nattemp + 1
+
     ! Estimate the new volume
     dispvol = 0.001
     volold = boxl**3
@@ -149,8 +152,6 @@ contains
     rhold = rho
     rho = np / volnew
 
-    nattemp = nattemp + 1
-
     call random_number(rng)
     no = int(rng*np) + 1
     call denergy(x, y, z, no, enero)
@@ -165,7 +166,7 @@ contains
 
     ! Compute the full energy
     call denergy(x, y, z, no, enern)
-    dener = enern-enero
+    dener = enern - enero
     denpt = pressure * (volnew - volold) + dener
     denpt = denpt + (np + 1) * (lnvolnew - lnvolold)
 
