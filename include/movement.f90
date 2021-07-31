@@ -116,8 +116,8 @@ contains
     end if
     end subroutine average
 
-    subroutine mcvolume(x, y, z, rhoave, ener, vattemp, vacc, del)
-    real(dp), intent(in) :: del, ener
+    subroutine mcvolume(x, y, z, rhoave, ener, vattemp, vacc)
+    real(dp), intent(in) :: ener
     real(dp), intent(inout) :: rhoave
     integer, intent(inout) :: vattemp, vacc
     real(dp), intent(inout) :: x(:), y(:), z(:)
@@ -179,15 +179,16 @@ contains
     end subroutine mcvolume
 
     ! This subroutine adjusts the displacement of particles
-    subroutine adjust(nattemp, nacc, del)
+    subroutine adjust(nattemp, nacc, del, tol)
         integer, intent(in) :: nattemp, nacc
+        real(dp), intent(in) :: tol
         real(dp), intent(inout) :: del
         ! Local variables
         real(dp) :: ratio
 
         if (mod(nattemp, nacc) == 0) then
             ratio = real(nacc, dp)/real(nattemp, dp)
-            if (ratio > 0.5_dp) then
+            if (ratio > tol) then
                 del = del*1.05_dp
             else
                 del = del*0.95_dp

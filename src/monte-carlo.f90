@@ -86,11 +86,12 @@ program main
     open(newunit=u, file = 'energy.dat', status = 'unknown')
     do i = 1, limT
         call mcmove(x, y, z, ener, nattemp, nacc, del)
-        call adjust(nattemp, nacc, del)
+        call adjust(nattemp, nacc, del, 0.5_dp)
 
         ! Adjust the box if asked for
         if ((nptvol == 1) .and. (mod(i, nptvolfreq)) == 0) then
-            call mcvolume(x, y, z, rhoave, ener, vattemp, vacc, del)
+            call mcvolume(x, y, z, rhoave, ener, vattemp, vacc)
+            call adjust(vattemp, vacc, dispvol, 0.2_dp)
         end if
         
         if (mod(i, 100) == 0) then
@@ -125,11 +126,12 @@ program main
 
     do i = 1, limG
         call average(x, y, z, g, s, ener, nattemp, nacc, ng, naveg, del, dr, pbc)
-        call adjust(nattemp, nacc, del)
+        call adjust(nattemp, nacc, del, 0.5_dp)
         
         ! Adjust the box if asked for
         if ((nptvol == 1) .and. (mod(i, nptvolfreq)) == 0) then
-            call mcvolume(x, y, z, rhoave, ener, vattemp, vacc, del)
+            call mcvolume(x, y, z, rhoave, ener, vattemp, vacc)
+            call adjust(vattemp, vacc, dispvol, 0.2_dp)
             print*, 'MC Step, Density average, box size, Vol ratio'
             volratio = real(vacc, dp) / real(vattemp, dp)
             print*, i, rhoave / vacc, boxl, volratio
