@@ -175,17 +175,25 @@ contains
     call denergy(x, y, z, no, enern)
     dener = enern-enero
     denpt = pressure * (volnew - volold) + dener
-    denpt = denpt + (3.0_dp * np + 4.0_dp) * log(adjust) * ktemp
+    denpt = denpt + (np + 1) * (lnvolnew - lnvolold)
 
     ! Apply Metropolis criteria
     call random_number(rng)
-    if (rng < exp(-denpt / ktemp)) then
-        ener = ener+dener
-        nacc = nacc+1
+    if (rng <= exp(-denpt / ktemp)) then
+        ener = ener + dener
+        nacc = nacc + 1
     else
         x(no) = xo
         y(no) = yo
         z(no) = zo
+
+        do i = 1, np
+            x(i) = x(i) / adjust
+            y(i) = y(i) / adjust
+            z(i) = z(i) / adjust
+        end do
+
+        boxl = volold**(1/3)
     end if
     end subroutine mcvolume
 
