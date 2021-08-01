@@ -10,7 +10,8 @@ program main
     ! Local variables, note that somes variables are initialized
     real(dp), allocatable :: x(:), y(:), z(:)
     real(dp) :: del = 0.1_dp, ener, dv, dt2, dphi, sumq, qs
-    real(dp) :: rng, d, dr, dq, rhoave, volratio, rhoaverage
+    real(dp) :: rng, d, dr, dq, rhoave, volratio
+    real(dp) :: rhoaverage, rhosq, rhoprom, rhomean, rhodev
     integer :: nattemp = 0
     integer :: nacc = 1, nacco, nav, i, j, ncq = 0
     integer :: ng = 0, naveg = 0
@@ -36,6 +37,8 @@ program main
     vacc = 1
     vattemp = 0
     j = 1
+    rhoprom = 0.0_dp
+    rhosq = 0.0_dp
 
     print*, 'rc = ', rc
     print*, 'dr = ', dr
@@ -44,7 +47,8 @@ program main
     print*, 'Reference density = ', rho
 
     ! Allocate memory for arrays
-    allocate(x(np), y(np), z(np), rhoacc(nint((limT / 2) / avevolfreq))
+    allocate(x(np), y(np), z(np), rhoacc((limT / 2) / avevolfreq))
+    rhoacc = 0.0_dp
 
     ! initial configuration and initial energy
     call iniconfig(x, y, z, d)
@@ -79,12 +83,14 @@ program main
 
         ! Start accumulating results
         if (i > limT / 2) then
-            if (mod(i, 50000) == 0) then
+            if (mod(i, avevolfreq) == 0) then
                 print*, 'Accumulating results...'
                 print*, 'MC Step, Density average, box size, Vol ratio, Vol disp'
                 volratio = real(vacc, dp) / real(vattemp, dp)
                 rhoaverage = rhoave / vacc
                 rhoacc(j) = rhoaverage
+                rhoprom = rhoprom + rhoaverage
+                rhosq = rhosq + rhoaverage**2
                 print*, i, rhoaverage, boxl, volratio, dispvol
                 write(v, *) i, rhoaverage
                 j = j + 1
@@ -96,6 +102,12 @@ program main
     close(u)
     close(v)
     call block_average(rhoacc)
+    ! Do some averaging
+    rhoprom = rhoprom / real(j, dp)
+    rhosq = rhosq / real(j, dp)
+    rhodev = sqrt(rhosq - rhoprom**2)
+    print*, 'Average, std deviation'
+    print*, rhoprom, rhodev
     ! write the final configuration and the energy
     open(newunit=u, file = 'finalconf.dat', status = 'unknown')
     do i = 1, np
