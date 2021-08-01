@@ -11,11 +11,11 @@ program main
     real(dp), allocatable :: x(:), y(:), z(:)
     real(dp), allocatable :: r(:), g(:), q(:), s(:)
     real(dp) :: del = 0.1_dp, ener, dv, dt2, dphi, sumq, qs
-    real(dp) :: rng, d, dr, dq, rhoave, volratio
+    real(dp) :: rng, d, dr, dq, rhoave, volratio, rhoaverage
     integer :: nattemp = 0
     integer :: nacc = 1, nacco, nav, i, j, ncq = 0
     integer :: ng = 0, naveg = 0
-    integer, parameter :: limT = 15000000
+    integer, parameter :: limT = 20000000
     integer :: limG, u, nptvol, nptvolfreq, vacc, vattemp
     integer :: vacco
     ! Condiciones periódicas a la frontera
@@ -119,7 +119,9 @@ program main
     !MC cycle to calculate the g(r)
     nacco = nacc
     vacco = vacc
+    rhoave = rhoave / vacc
     vacc = 1
+    vattemp = 0
     g = 0.0_dp
 
     open(newunit = u, file = 'density.dat', status = 'unknown')
@@ -132,13 +134,18 @@ program main
         if ((nptvol == 1) .and. (mod(i, nptvolfreq)) == 0) then
             call mcvolume(x, y, z, rhoave, ener, vattemp, vacc)
             call adjust(vattemp, vacc, dispvol, 0.2_dp)
-            print*, 'MC Step, Density average, box size, Vol ratio'
-            volratio = real(vacc, dp) / real(vattemp, dp)
-            print*, i, rhoave / vacc, boxl, volratio
-            write(u, *) i, rhoave / vacc
         end if
 
-        if (mod(i, 100000) == 0) print*, i, 'calculating g(r) and S(q)'
+        if (mod(i, 10000) == 0) then
+            print*, i, 'calculating g(r) and S(q)'
+            print*, 'MC Step, Particle disp, Energy / N'
+            print*, i, del, ener/np
+            print*, 'MC Step, Density average, box size, Vol ratio, Vol disp'
+            volratio = real(vacc, dp) / real(vattemp, dp)
+            rhoaverage = rhoave / vacc
+            print*, i, rhoaverage, boxl, volratio, dispvol
+            write(u, *) i, rhoaverage
+        end if
     end do
 
     close(u)
