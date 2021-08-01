@@ -92,7 +92,7 @@ program main
                 rhoprom = rhoprom + rhoaverage
                 rhosq = rhosq + rhoaverage**2
                 print*, i, rhoaverage, boxl, volratio, dispvol
-                write(v, *) i, rhoaverage
+                write(v, fmt='(f13.10)') rhoaverage
                 j = j + 1
             end if
         end if
@@ -105,7 +105,7 @@ program main
     ! Do some averaging
     rhoprom = rhoprom / real(j, dp)
     rhosq = rhosq / real(j, dp)
-    rhodev = sqrt(rhosq - rhoprom**2)
+    rhodev = sqrt((rhosq - rhoprom**2) / real(j, dp))
     print*, 'Average, std deviation'
     print*, rhoprom, rhodev
     ! write the final configuration and the energy
