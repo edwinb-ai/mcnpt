@@ -4,7 +4,7 @@ module utils
 
     implicit none
 
-    public iniconfig, parse_input
+    public iniconfig, parse_input, block_average
 
 contains
     subroutine iniconfig(x, y, z, d)
@@ -61,4 +61,47 @@ contains
         close(u)
         
     end subroutine parse_input
+
+    subroutine block_average(x)
+        real(dp), intent(in) :: x(:)
+
+        integer :: nstep, tblock, nblock, blk, stp1, stp2, trun
+        real(dp) :: a_blk, a_run, a_var, a_var_1, a_err, si, a_avg
+        real(dp), allocatable :: xcentre(:)
+
+        nstep = size(x)
+        allocate(xcentre(nstep))
+        a_avg   = sum(a) / real(nstep, dp)      ! Sample average
+        xcentre = x - a_avg                    ! Centre the data
+        a_var_1 = sum(xcentre**2) / real(nstep-1, dp) ! Bias-corrected sample variance
+
+        do nblock = 20, 4, -1 ! Loop over number, and hence length, of blocks
+
+        tblock = nstep / nblock              ! Block length in steps (rounded down)
+        trun   = nblock*tblock               ! Run length in steps, accounting for rounding
+        a_run  = sum(x(1:trun)) / real(trun, dp) ! Average of data
+        a_var  = 0.0_dp                       ! Zero mean-square block average accumulator
+
+        do blk = 1, nblock ! Loop over blocks
+            stp1  = (blk-1)*tblock+1                            ! Start of block
+            stp2  = blk*tblock                                  ! End of block
+            a_blk = sum(x(stp1:stp2) - a_run)/real(tblock, dp) ! Block average of deviation
+            a_var = a_var + a_blk**2                            ! Mean-square block average
+        end do ! End loop over blocks
+
+        a_var = a_var / real(nblock-1, dp)    ! Bias-corrected variance of block averages
+        a_err = sqrt(a_var/real(nblock, dp))  ! Estimate of error from block-average variance
+        si = tblock * a_var / a_var_1  ! Statistical inefficiency
+
+        ! WRITE ( unit=output_unit, fmt='(2i15,3f15.6)' ) tblock, nblock, a_err, si
+        print*, tblock, nblock, a_err, a_run, si
+
+    end do ! End loop over number, and hence length, of blocks
+
+    ! WRITE ( unit=output_unit, fmt='(a)' ) 'Plateau at large tblock (small nblock)'
+    ! WRITE ( unit=output_unit, fmt='(a)' ) 'should agree quite well with exact error estimate'
+    ! WRITE ( unit=output_unit, fmt='(a)' ) 'Can plot SI or error**2 against 1/tblock'
+    deallocate(xcentre)
+
+    end subroutine block_average
 end module utils

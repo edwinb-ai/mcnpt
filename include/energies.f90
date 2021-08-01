@@ -2,6 +2,7 @@ module energies
     use ieee_arithmetic, only: ieee_positive_inf, ieee_value
     use types
     use parameters
+    use omp_lib
     
     implicit none
     
@@ -19,8 +20,11 @@ contains
         
         ener = 0.0_dp
 
-        do i = 1, np - 1
-            do j = i + 1, np
+        !$omp parallel default(shared) private(i,j,uij,xij,yij,zij,rij)
+        !$omp do reduction(+:ener)
+        do i = 1, np
+            do j = 1, np
+                if (i == j) cycle
                 uij = 0.0_dp
 
                 xij = x(j)-x(i)
@@ -37,10 +41,12 @@ contains
                 if (rij < rc) then
                     ! call pseudohs(rij, uij)
                     call hardsphere(rij, uij)
-                    ener = ener + uij
+                    ener = ener + uij / 2.0_dp
                 end if
             end do
         end do
+        !$omp end do
+        !$omp end parallel
     end subroutine energy
 
     ! This subroutine calculates the difference in energy when a particle is displaced
@@ -53,6 +59,9 @@ contains
         real(dp) :: rij, xij, yij, zij, uij
 
         dener = 0.0_dp ! initializing
+
+        !$omp parallel do default(shared) private(i,xij,yij,zij,rij,uij) &
+        !$omp reduction(+:dener)
         do i = 1, np
             if ( i == no ) cycle
 
@@ -73,6 +82,7 @@ contains
                 dener = dener + uij
             end if
         end do
+        !$omp end parallel do
     end subroutine denergy
 
     ! This configuration calculates the pair potential between particles i & j

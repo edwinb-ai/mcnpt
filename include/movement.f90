@@ -6,7 +6,7 @@ module movement
 
     implicit none
 
-    public mcmove, adjust, average, mcvolume
+    public mcmove, adjust, mcvolume
 contains
     ! This subroutine displace the system to a new configuration
     subroutine mcmove(x, y, z, ener, nattemp, nacc, del)
@@ -56,65 +56,6 @@ contains
         z(no) = zo
     end if
     end subroutine mcmove
-
-    subroutine average(x, y, z, g, s, ener, nattemp, nacc, ng, naveg, del, dr, pbc)
-    real(dp), intent(inout) :: x(:), y(:), z(:)
-    real(dp), intent(inout) :: g(:), s(:)
-
-    real(dp), intent(in) :: del, dr
-    integer, intent(inout) :: nattemp, nacc, naveg, ng
-    real(dp), intent(inout) :: ener
-    integer, intent(in) :: pbc
-
-    ! Local variables
-    integer :: no
-    real(dp) :: rng
-    real(dp) :: xo, yo, zo, enero, enern, dener
-    
-    nattemp = nattemp + 1
-
-    call random_number(rng)
-    no = int(rng * np) + 1
-
-    xo = x(no)
-    yo = y(no)
-    zo = z(no)
-
-    call denergy(x, y, z, no, enero)
-
-    call random_number(rng)
-    x(no) = x(no)+(rng-0.5_dp)*del
-    call random_number(rng)
-    y(no) = y(no)+(rng-0.5_dp)*del
-    call random_number(rng)
-    z(no) = z(no)+(rng-0.5_dp)*del
-
-    !periodic boundary conditions
-    x(no) = x(no)-boxl*dnint(x(no)/boxl)
-    y(no) = y(no)-boxl*dnint(y(no)/boxl)
-    z(no) = z(no)-boxl*dnint(z(no)/boxl)
-
-    call denergy(x, y, z, no, enern)
-
-    dener = enern-enero
-
-    call random_number(rng)
-    if (rng <= exp(-dener / ktemp)) then
-        ener = ener + dener
-        nacc = nacc + 1
-        ng = ng + 1
-        ! Calcular observables
-        if (mod(ng, np) == 0) then
-            naveg = naveg + 1
-            call rdf(x, y, z, dr, g, pbc)
-            call sq(x, y, z, s, pbc)
-        end if
-    else
-        x(no) = xo
-        y(no) = yo
-        z(no) = zo
-    end if
-    end subroutine average
 
     subroutine mcvolume(x, y, z, rhoave, ener, vattemp, vacc)
     real(dp), intent(in) :: ener
