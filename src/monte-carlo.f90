@@ -15,7 +15,7 @@ program main
     integer :: nattemp = 0
     integer :: nacc = 1, nacco, nav, i, j, ncq = 0
     integer :: ng = 0, naveg = 0
-    integer, parameter :: limT = 20000000
+    integer, parameter :: limT = 2000000
     integer :: limG, u, nptvol, nptvolfreq, vacc, vattemp
     integer :: vacco
     ! Condiciones periódicas a la frontera
@@ -119,7 +119,10 @@ program main
     !MC cycle to calculate the g(r)
     nacco = nacc
     vacco = vacc
-    rhoave = rhoave / vacc
+    rho = rhoave / vacc
+    boxl = (np / rho)**(1.0_dp/3.0_dp)
+    rc = boxl * 0.5_dp
+    rhoave = 0.0_dp
     vacc = 1
     vattemp = 0
     g = 0.0_dp
@@ -136,13 +139,13 @@ program main
             call adjust(vattemp, vacc, dispvol, 0.2_dp)
         end if
 
-        if (mod(i, 10000) == 0) then
+        if (mod(i, 250000) == 0) then
             print*, i, 'calculating g(r) and S(q)'
             print*, 'MC Step, Particle disp, Energy / N'
             print*, i, del, ener/np
             print*, 'MC Step, Density average, box size, Vol ratio, Vol disp'
             volratio = real(vacc, dp) / real(vattemp, dp)
-            rhoaverage = rhoave / vacc
+            rhoaverage = rhoave / real(vacc, dp)
             print*, i, rhoaverage, boxl, volratio, dispvol
             write(u, *) i, rhoaverage
         end if
