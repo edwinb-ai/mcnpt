@@ -68,3 +68,6 @@ pressure. It also provides the standard error for this average.
 
 With both the pressure and the density, one can plot the equation of state for a given
 potential.
+
+If you are looking for a way to compute the radial distribution function or the structure
+factor, please do look into [mcfort](https://github.com/edwinb-ai/mcfort).
