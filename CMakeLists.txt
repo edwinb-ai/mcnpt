@@ -7,7 +7,6 @@ enable_language(Fortran)
 # gfortran flags for production runs
 if(CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
     set(dialect "-Wall -Wextra -Wimplicit-interface -fPIC -Werror -fmax-errors=1 -Ofast -march=native -funroll-loops")
-    set(bounds "-fbounds-check")
 endif()
 
 set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} ${dialect}")
