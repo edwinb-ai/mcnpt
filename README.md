@@ -52,7 +52,7 @@ This is the main executable.
 
 ## Usage
 
-The `mcnpt` executable expects a file called `input.in` with *eight values* in it:
+The `mcnpt` executable expects a file called `input.in` with *six values* in it:
 
 - _Packing fraction_, a value between strictly larger than 0 and strictly less than 0.49. Any value in between is acceptable. This value will determine the density of the system.
 - _Reduced temperature_.
