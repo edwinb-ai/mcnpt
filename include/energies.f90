@@ -1,7 +1,7 @@
 module energies
-    use potentials
     use types
     use parameters
+    use potentials
     use omp_lib
     
     implicit none

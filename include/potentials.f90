@@ -3,16 +3,18 @@ module potentials
 use ieee_arithmetic, only: ieee_positive_inf, ieee_value
 use types
 
-! Intrinsic pseudohs potential arguments that need to be computed
-! only once
-real(dp), parameter :: dlr = 50.0_dp, dT = 1.4737_dp
-real(dp), parameter :: dla = 49.0_dp
-real(dp), parameter :: a2 = (dlr/(dlr-dla))*(dlr/dla)**(dla/(dlr-dla))
-real(dp), parameter :: bpot = (dlr/dla)**(1.0_dp/(dlr-dla))
-
 implicit none
 
-public pseudohs, hardsphere, lennardjones, hertzian, &
+! Intrinsic pseudohs potential arguments that need to be computed
+! only once
+real(dp), parameter, private :: dlr = 50.0_dp, dT = 1.4737_dp
+real(dp), parameter, private :: dla = 49.0_dp
+real(dp), parameter, private :: a2 = (dlr/(dlr-dla))*(dlr/dla)**(dla/(dlr-dla))
+real(dp), parameter, private :: bpot = (dlr/dla)**(1.0_dp/(dlr-dla))
+
+! Export all the potentials
+! Make them protected so that their parameters can't be modified accidentally
+protected pseudohs, hardsphere, lennardjones, hertzian, &
 softsphere, yukawa_attr, gaussian
 
 contains
