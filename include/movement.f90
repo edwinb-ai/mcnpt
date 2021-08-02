@@ -2,7 +2,6 @@ module movement
     use types
     use parameters
     use energies
-    use observables, only: rdf, sq
 
     implicit none
 

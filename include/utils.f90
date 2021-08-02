@@ -55,8 +55,6 @@ contains
         read(u, *) pressure
         read(u, *) dispvol
         read(u, *) np
-        read(u, *) nvq
-        read(u, *) mr
         read(u, *) limg
         close(u)
         

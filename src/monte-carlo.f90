@@ -9,12 +9,12 @@ program main
 
     ! Local variables, note that somes variables are initialized
     real(dp), allocatable :: x(:), y(:), z(:)
-    real(dp) :: del = 0.1_dp, ener, dv, dt2, dphi, sumq, qs
-    real(dp) :: rng, d, dr, dq, rhoave, volratio
+    real(dp) :: del = 0.1_dp, ener
+    real(dp) :: rng, d, dr, rhoave, volratio
     real(dp) :: rhoaverage, rhosq, rhoprom, rhomean, rhodev
     integer :: nattemp = 0
-    integer :: nacc = 1, nacco, nav, i, j, ncq = 0
-    integer :: ng = 0, naveg = 0
+    integer :: nacc = 1, nacco, nav, i, j
+    integer :: naveg = 0
     integer :: limT, u, nptvol, nptvolfreq, vacc, vattemp
     integer :: vacco, v, avevolfreq
     real(dp), allocatable :: rhoacc(:)
