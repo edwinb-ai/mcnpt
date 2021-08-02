@@ -1,26 +1,18 @@
-
-# Se compila todo el proyecto usando gfortran
+# We compile everything using gfortran
 cmake_minimum_required(VERSION 3.16)
 
-project(mcfort)
+project(mcnpt)
 enable_language(Fortran)
 
+# gfortran flags for production runs
 if(CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
-    set(dialect "-ffree-form -std=f2008 -g -fimplicit-none -fPIC -O3 -march=native -funroll-loops")
+    set(dialect "-Wall -Wextra -Wimplicit-interface -fPIC -Werror -fmax-errors=1 -Ofast -march=native -funroll-loops")
     set(bounds "-fbounds-check")
 endif()
-if(CMAKE_Fortran_COMPILER_ID MATCHES "Intel")
-    set(dialect "-stand f08 -free -implicitnone")
-    set(bounds "-check bounds")
-endif()
-if(CMAKE_Fortran_COMPILER_ID MATCHES "PGI")
-    set(dialect "-Mfreeform -Mdclchk -Mstandard -Mallocatable=03")
-    set(bounds "-C")
-endif()
 
-set(CMAKE_Fortran_FLAGS_DEBUG "${CMAKE_Fortran_FLAGS_DEBUG} ${bounds}")
 set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} ${dialect}")
 
+# Look for and add the OpenMP flags
 find_package(OpenMP REQUIRED)
 if(OPENMP_FOUND)
 message("OPENMP FOUND")
@@ -28,8 +20,9 @@ set(CMAKE_Fortran_FLAGS "${OpenMP_Fortran_FLAGS} ${dialect}")
 endif()
 
 #
-# Compilar
+# Compilation step
 #
-# Esta linea junta a todos los archivos y al programa principal
+# This line will gather all the files and compile them
 file(GLOB_RECURSE sources include/*.f90 src/*.f90)
+# The executable here is `mcnpt`
 add_executable(mcnpt ${sources})
