@@ -63,11 +63,11 @@ The `mcnpt` executable expects a file called `input.in` with *six values* in it:
 
 ## Observables
 
-The only observable that this computes is the average density given a value for the reduced
-pressure. It also provides the standard error for this average.
+The only observable that this code computes is the **average density** given a value 
+of the **reduced pressure**. It also provides the standard error for this average.
 
-With both the pressure and the density, one can plot the equation of state for a given
+With both the pressure and the density, one can obtain the equation of state for a given
 potential.
 
-If you are looking for a way to compute the radial distribution function or the structure
-factor, please do look into [mcfort](https://github.com/edwinb-ai/mcfort).
+If you are looking for a way to compute the _radial distribution function_ or the _structure
+factor_, please do look into [mcfort](https://github.com/edwinb-ai/mcfort).
