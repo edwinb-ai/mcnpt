@@ -1,9 +1,16 @@
-# Monte Carlo simulations of pseudo hard spheres
+# Monte Carlo simulations in the NPT ensemble
 
-This code can run Monte Carlo simulations using a pseudo hard sphere
-potential.
+This is actually a fork of [mcfort](https://github.com/edwinb-ai/mcfort)
+but this version works exclusively in the NPT ensemble.
 
-It is written from the ground up to be very fast and efficient.
+It was made for the sole purpose of computing the **equation of state**
+of fluids using the NPT ensemble method and the Monte Carlo simulation
+technique.
+
+It currently has several potentials implemented, but the source code must
+be modified by hand to enable them.
+
+It has basic multithreading capabilities to accelerate the energy computation.
 
 ## Build
 
@@ -40,33 +47,24 @@ and then run
 make
 ```
 
-Either way, an executable `mcfort` will be created inside the build directory.
+Either way, an executable `mcnpt` will be created inside the build directory.
 This is the main executable.
 
 ## Usage
 
-The `mcfort` executable expects a file called `input.in` with *four values* in it:
+The `mcnpt` executable expects a file called `input.in` with *eight values* in it:
 
-- Packing fraction, a value between strictly larger than 0 and strictly less than 0.49. Any value in between is acceptable. This value will determine the density of the system.
-- Number of particles, an integer. The larger this value, the longer it will take to run a simulation.
-- Number of q-vectors, the vectors to be used in order to estimate the structure factor. The larger this value, the longer it will take to run a simulation.
-- The number of bins to use for the observables. The larger the value, the more precise the observables will be. This means that more data will be computed.
-- Number of Monte Carlo cycles, this is the value to use in order to compute the observables.
+- _Packing fraction_, a value between strictly larger than 0 and strictly less than 0.49. Any value in between is acceptable. This value will determine the density of the system.
+- _Reduced temperature_.
+- _Reduced pressure_.
+- _Volume displacement_, logarithm based. This is just an initial value, as the code already handles the volume displacement automatically to set it between 15-20% acceptance.
+- _Number of particles_, an integer. The larger this value, the longer it will take to run a simulation.
+- _Number of Monte Carlo cycles_, this is the value to use in order to equilibrate and accumulate results. The default is to use half this number for equilibration and half for averaging results.
 
 ## Observables
 
-By default, this code will compute two main observables:
+The only observable that this computes is the average density given a value for the reduced
+pressure. It also provides the standard error for this average.
 
-- The radial distribution function, also known as g(r);
-- the structure factor, from the Statistical Mechanics definition, also known as S(q).
-
-These will appear as files named `gr.dat` and `sq.dat`.
-
-## Caveats
-
-There is no acceleration on this code. This is plain, old O(n^2) complexity.
-Although, it is very robust, and works as expected. It might take a long time, but it *will*
-give you the correct, physically-relevant result.
-
-The only potential supported is the pseudo hard sphere potential.
-Maybe in the future other potentials might be added.
+With both the pressure and the density, one can plot the equation of state for a given
+potential.
