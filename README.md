@@ -54,7 +54,7 @@ This is the main executable.
 
 The `mcnpt` executable expects a file called `input.in` with *six values* in it:
 
-- _Packing fraction_, a value between strictly larger than 0 and strictly less than 0.49. Any value in between is acceptable. This value will determine the density of the system.
+- _Packing fraction_, a value between strictly larger than 0 and strictly less than 1.0. Any value in between is acceptable. This value will determine the density of the system.
 - _Reduced temperature_.
 - _Reduced pressure_.
 - _Volume displacement_, logarithm based. This is just an initial value, as the code already handles the volume displacement automatically to set it between 15-20% acceptance.
