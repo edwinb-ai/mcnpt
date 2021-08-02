@@ -64,7 +64,7 @@ contains
 
     ! Local variables
     integer :: i
-    real(dp) :: enero, enern, dener 
+    real(dp) :: enern, dener 
     real(dp) :: rng, volold, volnew, lnvolold, lnvolnew
     real(dp) :: adjust, boxlnew, rhold, denpt
 

@@ -10,16 +10,13 @@ program main
     ! Local variables, note that somes variables are initialized
     real(dp), allocatable :: x(:), y(:), z(:)
     real(dp) :: del = 0.1_dp, ener
-    real(dp) :: rng, d, dr, rhoave, volratio
-    real(dp) :: rhoaverage, rhosq, rhoprom, rhomean, rhodev
+    real(dp) :: d, dr, rhoave, volratio
+    real(dp) :: rhoaverage, rhosq, rhoprom, rhodev
     integer :: nattemp = 0
-    integer :: nacc = 1, nacco, nav, i, j
-    integer :: naveg = 0
+    integer :: nacc = 1, i, j
     integer :: limT, u, nptvol, nptvolfreq, vacc, vattemp
-    integer :: vacco, v, avevolfreq
+    integer :: v, avevolfreq
     real(dp), allocatable :: rhoacc(:)
-    ! Condiciones periódicas a la frontera
-    integer :: pbc = 1
 
     ! Inicializar el RNG
     call random_seed()
