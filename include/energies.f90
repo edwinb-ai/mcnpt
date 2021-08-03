@@ -40,7 +40,7 @@ contains
 
                 if (rij < rc) then
                     ! call pseudohs(rij, uij)
-                    call hardsphere(rij, uij)
+                    call smooth_sw(rij, uij)
                     ener = ener + uij / 2.0_dp
                 end if
             end do
@@ -78,7 +78,7 @@ contains
 
             if (rij < rc) then
                 ! call pseudohs(rij, uij)
-                call hardsphere(rij, uij)
+                call smooth_sw(rij, uij)
                 dener = dener + uij
             end if
         end do

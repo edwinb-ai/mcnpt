@@ -2,6 +2,7 @@ module potentials
 
 use ieee_arithmetic, only: ieee_positive_inf, ieee_value
 use types
+use parameters
 
 implicit none
 
@@ -12,12 +13,60 @@ real(dp), parameter, private :: dla = 49.0_dp
 real(dp), parameter, private :: a2 = (dlr/(dlr-dla))*(dlr/dla)**(dla/(dlr-dla))
 real(dp), parameter, private :: bpot = (dlr/dla)**(1.0_dp/(dlr-dla))
 
+! Intrinsic parameters for the composition of square well, hard sphere, square
+! shoulder potential
+real(dp), parameter :: eps1 = -1.0_dp
+real(dp), parameter :: eps2 = 0.0_dp
+real(dp), parameter :: eps3 = 0.0_dp
+real(dp), parameter :: k1 = 1000.0_dp
+real(dp), parameter :: delta1 = pi / k1
+real(dp), parameter :: k2 = 1000.0_dp
+real(dp), parameter :: delta2 =pi / k2
+real(dp), parameter :: kappa = 1000000.0_dp
+real(dp), parameter :: lambda1 = 1.5_dp
+real(dp), parameter :: lambda2 = 0.0_dp
+real(dp), parameter :: lambda3 = 0.0_dp
+real(dp), parameter :: Asw = lambda1 - 0.5 * delta1
+real(dp), parameter :: Ass = lambda2 - 0.5 * delta2
+real(dp), parameter :: ao = 0.4675
+real(dp), parameter :: bo = 0.1074
+real(dp), parameter :: doo = 0.2049
+real(dp), parameter :: cparam = -1.4733
+real(dp), parameter :: alpha = ao + bo / (doo + abs(eps3)**cparam)
+real(dp), parameter :: delta3 = sqrt(-log(alpha) / kappa)
+real(dp), parameter :: A3sw = lambda3 - delta3
+
 ! Export all the potentials
 ! Make them protected so that their parameters can't be modified accidentally
 protected pseudohs, hardsphere, lennardjones, hertzian, &
-softsphere, yukawa_attr, gaussian
+softsphere, yukawa_attr, gaussian, smooth_sw
 
 contains
+    subroutine smooth_sw(rij, uij)
+        real(dp), intent(inout) :: uij
+        real(dp), intent(in) :: rij
+
+        if (rij < bpot) then
+            call pseudohs(rij, uij)
+            uij = uij + eps1
+        elseif ((bpot <= rij) .and. (rij <= Asw)) then
+            uij = eps1
+        elseif ((Asw < rij) .and. (rij <= (Asw + delta1))) then
+            uij = (eps1 + eps2) / 2.0_dp
+            uij = uij + ((abs(eps1) + abs(eps2)) / 2.0_dp) * (cos(k1 * (rij - Asw)))
+        elseif (((Asw + delta1) < rij) .and. (rij <= Ass)) then
+            uij = eps2
+        elseif ((Ass < rij) .and. (rij <= (Ass + delta2))) then
+            uij = (eps2 + eps3) / 2.0_dp
+            uij = uij + ((abs(eps2) + abs(eps3)) / 2.0_dp) * (cos(k2 * (rij - Ass)))
+        elseif (((Ass + delta2) < rij) .and. (rij <= A3sw)) then
+            uij = eps3
+        elseif (rij > A3sw) then
+            uij = eps3 * exp(-kappa * (rij - A3sw)**2)
+        else
+            uij = 0.0_dp
+        end if
+    end subroutine smooth_sw
     subroutine pseudohs(rij, uij)
         real(dp), intent(inout) :: uij
         real(dp), intent(in) :: rij

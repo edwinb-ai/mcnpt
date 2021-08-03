@@ -10,7 +10,7 @@ program main
     ! Local variables, note that somes variables are initialized
     real(dp), allocatable :: x(:), y(:), z(:)
     real(dp) :: del = 0.1_dp, ener
-    real(dp) :: d, dr, rhoave, volratio
+    real(dp) :: d, rhoave, volratio
     real(dp) :: rhoaverage, rhosq, rhoprom, rhodev
     integer :: nattemp = 0
     integer :: nacc = 1, i, j
@@ -27,7 +27,7 @@ program main
     boxl = (np / rho)**(1.0_dp/3.0_dp)
     rc = boxl * 0.5_dp
     d = (1.0_dp/rho)**(1.0_dp/3.0_dp)
-    nptvolfreq = np * 2
+    nptvolfreq = np * 3
     avevolfreq = 25000
     rhoave = 0.0_dp
     nptvol = 1
@@ -38,7 +38,6 @@ program main
     rhosq = 0.0_dp
 
     print*, 'rc = ', rc
-    print*, 'dr = ', dr
     print*, 'Mean interparticle distance: ', d
     print*, 'Pressure = ', pressure
     print*, 'Reference density = ', rho
@@ -86,8 +85,8 @@ program main
                 volratio = real(vacc, dp) / real(vattemp, dp)
                 rhoaverage = rhoave / vacc
                 rhoacc(j) = rhoaverage
-                rhoprom = rhoprom + rhoaverage
-                rhosq = rhosq + rhoaverage**2
+                rhoprom = rhoprom + rho
+                rhosq = rhosq + rho**2
                 print*, i, rhoaverage, boxl, volratio, dispvol
                 write(v, fmt='(f13.10)') rhoaverage
                 j = j + 1

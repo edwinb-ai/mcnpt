@@ -98,11 +98,11 @@ contains
     dener = enern - ener
     ! Compute the full exponential term for the NPT ensemble
     denpt = pressure * (volnew - volold) + dener
-    denpt = denpt - (np + 1) * (lnvolnew - lnvolold) * ktemp
+    denpt = denpt - real(np + 1, dp) * (lnvolnew - lnvolold) * ktemp
 
     ! Apply Metropolis criteria
     call random_number(rng)
-    if (rng <= exp(-denpt / ktemp)) then
+    if (rng < exp(-denpt / ktemp)) then
         rhoave = rhoave + rho
         vacc = vacc + 1
     else
