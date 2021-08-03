@@ -102,7 +102,7 @@ contains
 
     ! Apply Metropolis criteria
     call random_number(rng)
-    if (rng < exp(-denpt / ktemp)) then
+    if (rng <= exp(-denpt / ktemp)) then
         rhoave = rhoave + rho
         vacc = vacc + 1
     else

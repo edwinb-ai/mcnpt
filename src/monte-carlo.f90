@@ -27,7 +27,7 @@ program main
     boxl = (np / rho)**(1.0_dp/3.0_dp)
     rc = boxl * 0.5_dp
     d = (1.0_dp/rho)**(1.0_dp/3.0_dp)
-    nptvolfreq = np * 3
+    nptvolfreq = np * 2
     avevolfreq = 25000
     rhoave = 0.0_dp
     nptvol = 1
@@ -40,7 +40,7 @@ program main
     print*, 'rc = ', rc
     print*, 'Mean interparticle distance: ', d
     print*, 'Pressure = ', pressure
-    print*, 'Reference density = ', rho
+    print*, 'Reference density = ', rho, phi
 
     ! Allocate memory for arrays
     allocate(x(np), y(np), z(np), rhoacc((limT / 2) / avevolfreq))
