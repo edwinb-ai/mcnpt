@@ -10,27 +10,28 @@ program main
     ! Local variables, note that somes variables are initialized
     real(dp), allocatable :: x(:), y(:), z(:)
     real(dp) :: del = 0.1_dp, ener
-    real(dp) :: d, rhoave, volratio
+    real(dp) :: d, rhoave, volratio, rng
     real(dp) :: rhoaverage, rhosq, rhoprom, rhodev
-    integer :: nattemp = 0
+    integer :: nattemp = 0, rngint
     integer :: nacc = 1, i, j
-    integer :: limT, u, nptvol, nptvolfreq, vacc, vattemp
+    integer :: limT, u, nptvolfreq, vacc, vattemp
     integer :: v, avevolfreq
     real(dp), allocatable :: rhoacc(:)
 
-    ! Inicializar el RNG
+    ! Initialize the RNG
     call random_seed()
+
     ! Read an input file that contains all the necessary information
     call parse_input('input.in', limT)
+    
     ! Update the simulation parameters with this information
-    rho = 6.0_dp * real(phi) / pi
+    rho = 6.0_dp * real(phi, dp) / pi
     boxl = (np / rho)**(1.0_dp/3.0_dp)
     rc = boxl * 0.5_dp
     d = (1.0_dp/rho)**(1.0_dp/3.0_dp)
     nptvolfreq = np * 2
-    avevolfreq = 25000
+    avevolfreq = 50000
     rhoave = 0.0_dp
-    nptvol = 1
     vacc = 1
     vattemp = 0
     j = 1
@@ -56,13 +57,15 @@ program main
     open(newunit=u, file = 'energy.dat', status = 'unknown')
     open(newunit=v, file = 'density.dat', status = 'unknown')
     do i = 1, limT
-        call mcmove(x, y, z, ener, nattemp, nacc, del)
-        call adjust(nattemp, nacc, del, 0.5_dp)
+        call random_number(rng)
+        rngint = floor((np + 1) * rng)
 
-        ! Adjust the box if asked for
-        if ((nptvol == 1) .and. (mod(i, nptvolfreq)) == 0) then
+        if (rngint < np) then
+            call mcmove(x, y, z, ener, nattemp, nacc, del)
+            call adjust(nattemp, nacc, del, 0.5_dp)
+        else
             call mcvolume(x, y, z, rhoave, ener, vattemp, vacc)
-            call adjust(vattemp, vacc, dispvol, 0.2_dp)
+            call adjust(vattemp, vacc, dispvol, 0.4_dp)
         end if
         
         if (mod(i, 100) == 0) then
@@ -85,10 +88,10 @@ program main
                 volratio = real(vacc, dp) / real(vattemp, dp)
                 rhoaverage = rhoave / vacc
                 rhoacc(j) = rhoaverage
-                rhoprom = rhoprom + rho
-                rhosq = rhosq + rho**2
+                rhoprom = rhoprom + rhoaverage
+                rhosq = rhosq + rhoaverage**2
                 print*, i, rhoaverage, boxl, volratio, dispvol
-                write(v, fmt='(f13.10)') rhoaverage
+                write(v, fmt='(f12.10)') rhoaverage
                 j = j + 1
             end if
         end if
@@ -101,7 +104,7 @@ program main
     ! Do some averaging
     rhoprom = rhoprom / real(j, dp)
     rhosq = rhosq / real(j, dp)
-    rhodev = sqrt((rhosq - rhoprom**2) / real(j, dp))
+    rhodev = sqrt(rhosq - rhoprom**2)
     print*, 'Average, std deviation'
     print*, rhoprom, rhodev
     ! write the final configuration and the energy

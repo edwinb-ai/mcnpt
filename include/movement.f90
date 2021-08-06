@@ -38,17 +38,17 @@ contains
     z(no) = z(no)+(rng-0.5_dp)*del
 
     ! periodic boundary conditions
-    x(no) = x(no)-boxl*dnint(x(no)/boxl)
-    y(no) = y(no)-boxl*dnint(y(no)/boxl)
-    z(no) = z(no)-boxl*dnint(z(no)/boxl)
+    x(no) = x(no) - (boxl * dnint(x(no) / boxl))
+    y(no) = y(no) - (boxl * dnint(y(no) / boxl))
+    z(no) = z(no) - (boxl * dnint(z(no) / boxl))
 
     call denergy(x, y, z, no, enern)
 
     dener = enern-enero
     call random_number(rng)
     if (rng < exp(-dener / ktemp)) then
-        ener = ener+dener
-        nacc = nacc+1
+        ener = ener + dener
+        nacc = nacc + 1
     else
         x(no) = xo
         y(no) = yo
@@ -57,8 +57,7 @@ contains
     end subroutine mcmove
 
     subroutine mcvolume(x, y, z, rhoave, ener, vattemp, vacc)
-    real(dp), intent(in) :: ener
-    real(dp), intent(inout) :: rhoave
+    real(dp), intent(inout) :: rhoave, ener
     integer, intent(inout) :: vattemp, vacc
     real(dp), intent(inout) :: x(:), y(:), z(:)
 
@@ -102,7 +101,7 @@ contains
 
     ! Apply Metropolis criteria
     call random_number(rng)
-    if (rng <= exp(-denpt / ktemp)) then
+    if (rng < exp(-denpt / ktemp)) then
         rhoave = rhoave + rho
         vacc = vacc + 1
     else
@@ -129,9 +128,9 @@ contains
         if (mod(nattemp, nacc) == 0) then
             ratio = real(nacc, dp)/real(nattemp, dp)
             if (ratio > tol) then
-                del = del*1.05_dp
+                del = del * 1.05_dp
             else
-                del = del*0.95_dp
+                del = del * 0.95_dp
             end if
         end if
     end subroutine adjust

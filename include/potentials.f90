@@ -36,10 +36,13 @@ real(dp), parameter :: alpha = ao + bo / (doo + abs(eps3)**cparam)
 real(dp), parameter :: delta3 = sqrt(-log(alpha) / kappa)
 real(dp), parameter :: A3sw = lambda3 - delta3
 
+! Parameters for the true square well potential
+real(dp), parameter :: lambdasw = 1.5_dp
+
 ! Export all the potentials
 ! Make them protected so that their parameters can't be modified accidentally
 protected pseudohs, hardsphere, lennardjones, hertzian, &
-softsphere, yukawa_attr, gaussian, smooth_sw
+softsphere, yukawa_attr, gaussian, smooth_sw, square_well
 
 contains
     subroutine smooth_sw(rij, uij)
@@ -92,6 +95,20 @@ contains
         end if
 
     end subroutine hardsphere
+
+    subroutine square_well(rij, uij)
+        real(dp), intent(inout) :: uij
+        real(dp), intent(in) :: rij
+        real(dp) :: rinf
+
+        if (rij < 1.0_dp) then
+            uij = ieee_value(rinf, ieee_positive_inf)
+        elseif ((1.0_dp <= rij) .and. (rij < lambdasw)) then
+            uij = -1.0_dp
+        else
+            uij = 0.0_dp
+        end if
+    end subroutine square_well
 
     subroutine lennardjones(rij, uij)
         real(dp), intent(inout) :: uij

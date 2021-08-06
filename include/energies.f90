@@ -39,9 +39,8 @@ contains
                 rij = norm2([xij, yij, zij])
 
                 if (rij < rc) then
-                    ! call pseudohs(rij, uij)
                     call smooth_sw(rij, uij)
-                    ener = ener + uij / 2.0_dp
+                    ener = ener + (uij / 2.0_dp)
                 end if
             end do
         end do
@@ -77,7 +76,6 @@ contains
             rij = norm2([xij, yij, zij])
 
             if (rij < rc) then
-                ! call pseudohs(rij, uij)
                 call smooth_sw(rij, uij)
                 dener = dener + uij
             end if
