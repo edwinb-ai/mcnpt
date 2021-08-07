@@ -84,9 +84,9 @@ program main
         end if
         
         if (mod(i, 1000000) == 0) then
-            print*, 'MC Step, Particle disp, Energy / N'
+            write(unit=output_unit, fmt='(a)') 'MC Step, Particle disp, Energy / N'
             print*, i, del, ener/real(np, dp), real(nacc, dp) / real(nattemp, dp)
-            print*, 'MC Step, Density average, box size, Vol ratio, Vol disp'
+            write(unit=output_unit, fmt='(a)') 'MC Step, Density average, box size, Vol ratio, Vol disp'
             volratio = real(vacc, dp) / real(vattemp, dp)
             print*, i, rhoave / vacc, boxl, volratio, dispvol
         end if
@@ -111,15 +111,11 @@ program main
         end if
 
         if (mod(i, avevolfreq) == 0) then
-            ! write(unit=output_unit, fmt='(a)') 'Accumulating results...'
-            ! write(unit=output_unit, fmt='(a)') 'MC Step, Density average, box size, &
-            ! & Vol ratio, Vol disp'
             volratio = real(vacc, dp) / real(vattemp, dp)
             rhoaverage = rhoave / vacc
             rhoacc(j) = rhoaverage
             rhoprom = rhoprom + rhoaverage
             rhosq = rhosq + rhoaverage**2
-            ! print*, i, rhoaverage, boxl, volratio, dispvol
             write(unit=v, fmt='(f12.10)') rhoaverage
             j = j + 1
         end if
