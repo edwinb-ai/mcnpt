@@ -24,9 +24,9 @@ contains
 
     call random_number(rng)
     no = int(rng*np)+1
-    call denergy(x, y, z, no, enero) !intruduzco el valor de energia de conf inicial
+    call denergy(x, y, z, no, enero)
 
-    xo = x(no) !coordenadas de de la particula aleatoriamente escogida
+    xo = x(no)
     yo = y(no)
     zo = z(no)
 
@@ -38,9 +38,9 @@ contains
     z(no) = z(no)+(rng-0.5_dp)*del
 
     ! periodic boundary conditions
-    x(no) = x(no) - (boxl * dnint(x(no) / boxl))
-    y(no) = y(no) - (boxl * dnint(y(no) / boxl))
-    z(no) = z(no) - (boxl * dnint(z(no) / boxl))
+    x(no) = x(no) - (boxl * nint(x(no) / boxl))
+    y(no) = y(no) - (boxl * nint(y(no) / boxl))
+    z(no) = z(no) - (boxl * nint(z(no) / boxl))
 
     call denergy(x, y, z, no, enern)
 
@@ -57,7 +57,8 @@ contains
     end subroutine mcmove
 
     subroutine mcvolume(x, y, z, rhoave, ener, vattemp, vacc)
-    real(dp), intent(inout) :: rhoave, ener
+    real(dp), intent(inout) :: rhoave
+    real(dp), intent(in) :: ener
     integer, intent(inout) :: vattemp, vacc
     real(dp), intent(inout) :: x(:), y(:), z(:)
 

@@ -70,6 +70,7 @@ contains
             uij = 0.0_dp
         end if
     end subroutine smooth_sw
+    
     subroutine pseudohs(rij, uij)
         real(dp), intent(inout) :: uij
         real(dp), intent(in) :: rij
@@ -103,7 +104,7 @@ contains
 
         if (rij < 1.0_dp) then
             uij = ieee_value(rinf, ieee_positive_inf)
-        elseif ((1.0_dp <= rij) .and. (rij < lambdasw)) then
+        elseif ((1.0_dp < rij) .and. (rij < lambdasw)) then
             uij = -1.0_dp
         else
             uij = 0.0_dp

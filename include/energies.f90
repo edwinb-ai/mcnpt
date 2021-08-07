@@ -40,12 +40,14 @@ contains
 
                 if (rij < rc) then
                     call smooth_sw(rij, uij)
-                    ener = ener + (uij / 2.0_dp)
+                    ener = ener + uij
                 end if
             end do
         end do
         !$omp end do
         !$omp end parallel
+
+        ener = ener / 2.0_dp
     end subroutine energy
 
     ! This subroutine calculates the difference in energy when a particle is displaced
@@ -69,9 +71,9 @@ contains
             zij = z(no)-z(i)
             
             ! Minimum image convention
-            xij = xij-boxl*dnint(xij/boxl)
-            yij = yij-boxl*dnint(yij/boxl)
-            zij = zij-boxl*dnint(zij/boxl)
+            xij = xij-boxl*nint(xij/boxl)
+            yij = yij-boxl*nint(yij/boxl)
+            zij = zij-boxl*nint(zij/boxl)
             
             rij = norm2([xij, yij, zij])
 

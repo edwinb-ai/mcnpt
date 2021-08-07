@@ -50,12 +50,13 @@ contains
 
         open(newunit=u, file=filein, status='old')
         ! Leer todas las variables
-        read(u, *) phi
+        read(u, *) rho
         read(u, *) ktemp
         read(u, *) pressure
         read(u, *) dispvol
         read(u, *) np
         read(u, *) limg
+        read(u, *) from_file
         close(u)
         
     end subroutine parse_input
