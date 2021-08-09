@@ -50,6 +50,7 @@ program main
     rhoacc = 0.0_dp
 
     if (from_file) then
+        write(unit=output_unit, fmt='(a)') 'Reading from positions file...'
         open(newunit=u, file = 'configuration.dat', status = 'unknown')
             do i = 1, np
                 read(u, *) x(i), y(i), z(i)
