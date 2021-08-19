@@ -38,7 +38,7 @@ program main
     j = 1
     rhoprom = 0.0_dp
     rhosq = 0.0_dp
-    thermsteps = 2e8
+    thermsteps = 1e9
 
     print*, 'rc = ', rc
     print*, 'Mean interparticle distance: ', d
@@ -74,10 +74,10 @@ program main
 
         if (rngint < np) then
             call mcmove(x, y, z, ener, nattemp, nacc, del)
-            call adjust(nattemp, nacc, del, 0.5_dp)
+            call adjust(nattemp, nacc, del, 0.35_dp)
         else
             call mcvolume(x, y, z, rhoave, ener, vattemp, vacc)
-            call adjust(vattemp, vacc, dispvol, 0.4_dp)
+            call adjust(vattemp, vacc, dispvol, 0.15_dp)
         end if
         
         if (mod(i, 100) == 0) then
@@ -101,10 +101,10 @@ program main
 
         if (rngint < np) then
             call mcmove(x, y, z, ener, nattemp, nacc, del)
-            call adjust(nattemp, nacc, del, 0.5_dp)
+            call adjust(nattemp, nacc, del, 0.35_dp)
         else
             call mcvolume(x, y, z, rhoave, ener, vattemp, vacc)
-            call adjust(vattemp, vacc, dispvol, 0.4_dp)
+            call adjust(vattemp, vacc, dispvol, 0.15_dp)
         end if
         
         if (mod(i, avevolfreq) == 0) then

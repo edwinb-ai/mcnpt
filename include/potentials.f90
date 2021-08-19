@@ -56,7 +56,7 @@ contains
             uij = eps1
         elseif ((Asw < rij) .and. (rij <= (Asw + delta1))) then
             uij = (eps1 + eps2) / 2.0_dp
-            uij = uij + ((abs(eps1) + abs(eps2)) / 2.0_dp) * (cos(k1 * (rij - Asw)))
+            uij = uij - ((abs(eps1) + abs(eps2)) / 2.0_dp) * (cos(k1 * (rij - Asw)))
         elseif (((Asw + delta1) < rij) .and. (rij <= Ass)) then
             uij = eps2
         elseif ((Ass < rij) .and. (rij <= (Ass + delta2))) then
