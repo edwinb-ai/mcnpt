@@ -65,7 +65,7 @@ contains
     ! Local variables
     integer :: i
     real(dp) :: enern, dener 
-    real(dp) :: rng, volold, volnew, lnvolold, lnvolnew
+    real(dp) :: rng, volold, volnew, lnvolnew
     real(dp) :: adjust, boxlnew, rhold, denpt
 
     ! Count as a movement always
@@ -73,9 +73,8 @@ contains
 
     ! Estimate the new volume
     volold = boxl**3
-    lnvolold = log(volold)
     call random_number(rng)
-    lnvolnew = lnvolold + (dispvol * (rng - 0.5_dp))
+    lnvolnew = log(volold) + (dispvol * (rng - 0.5_dp))
     volnew = exp(lnvolnew)
     boxlnew = volnew**(1.0_dp / 3.0_dp)
 
@@ -98,7 +97,7 @@ contains
     dener = enern - ener
     ! Compute the full exponential term for the NPT ensemble
     denpt = pressure * (volnew - volold) + dener
-    denpt = denpt - real(np + 1, dp) * (lnvolnew - lnvolold) * ktemp
+    denpt = denpt - real(np + 1, dp) * log(volnew / volold) * ktemp
 
     ! Apply Metropolis criteria
     call random_number(rng)

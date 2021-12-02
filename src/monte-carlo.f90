@@ -9,7 +9,7 @@ program main
 
     ! Local variables, note that somes variables are initialized
     real(dp), allocatable :: x(:), y(:), z(:)
-    real(dp) :: del = 0.1_dp, ener
+    real(dp) :: del = 0.7_dp, ener
     real(dp) :: d, rhoave, volratio
     real(dp) :: rng
     real(dp) :: rhoaverage, rhosq, rhoprom, rhodev
@@ -38,7 +38,7 @@ program main
     j = 1
     rhoprom = 0.0_dp
     rhosq = 0.0_dp
-    thermsteps = 1e9
+    thermsteps = 3e8
 
     print*, 'rc = ', rc
     print*, 'Mean interparticle distance: ', d
@@ -77,7 +77,7 @@ program main
             call adjust(nattemp, nacc, del, 0.35_dp)
         else
             call mcvolume(x, y, z, rhoave, ener, vattemp, vacc)
-            call adjust(vattemp, vacc, dispvol, 0.15_dp)
+            call adjust(vattemp, vacc, dispvol, 0.10_dp)
         end if
         
         if (mod(i, 100) == 0) then
@@ -104,7 +104,7 @@ program main
             call adjust(nattemp, nacc, del, 0.35_dp)
         else
             call mcvolume(x, y, z, rhoave, ener, vattemp, vacc)
-            call adjust(vattemp, vacc, dispvol, 0.15_dp)
+            call adjust(vattemp, vacc, dispvol, 0.10_dp)
         end if
         
         if (mod(i, avevolfreq) == 0) then
