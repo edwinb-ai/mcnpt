@@ -13,7 +13,6 @@ contains
     real(dp), intent(inout) :: ener
     integer, intent(inout) :: nattemp, nacc
     real(dp), intent(inout) :: x(:), y(:), z(:)
-    ! it is because are evaluate
 
     ! Local variables
     integer :: no
@@ -23,7 +22,7 @@ contains
     nattemp = nattemp + 1
 
     call random_number(rng)
-    no = int(rng*np)+1
+    no = int(rng * np)+1
     call denergy(x, y, z, no, enero)
 
     xo = x(no)
@@ -31,11 +30,11 @@ contains
     zo = z(no)
 
     call random_number(rng)
-    x(no) = x(no)+(rng-0.5_dp)*del
+    x(no) = x(no) + (rng - 0.5_dp) * del
     call random_number(rng)
-    y(no) = y(no)+(rng-0.5_dp)*del
+    y(no) = y(no) + (rng - 0.5_dp) * del
     call random_number(rng)
-    z(no) = z(no)+(rng-0.5_dp)*del
+    z(no) = z(no) + (rng - 0.5_dp) * del
 
     ! periodic boundary conditions
     x(no) = x(no) - (boxl * nint(x(no) / boxl))
@@ -44,7 +43,7 @@ contains
 
     call denergy(x, y, z, no, enern)
 
-    dener = enern-enero
+    dener = enern - enero
     call random_number(rng)
     if (rng < exp(-dener / ktemp)) then
         ener = ener + dener
@@ -66,7 +65,7 @@ contains
     integer :: i
     real(dp) :: enern, dener 
     real(dp) :: rng, volold, volnew, lnvolnew
-    real(dp) :: adjust, boxlnew, rhold, denpt
+    real(dp) :: voladjust, boxlnew, rhold, denpt
 
     ! Count as a movement always
     vattemp = vattemp + 1
@@ -79,13 +78,13 @@ contains
     boxlnew = volnew**(1.0_dp / 3.0_dp)
 
     ! Adjust the particles to the new box
-    adjust = boxlnew / boxl
+    voladjust = boxlnew / boxl
     boxl = boxlnew
     rc = boxl / 2.0_dp
     do i = 1, np
-        x(i) = x(i) * adjust
-        y(i) = y(i) * adjust
-        z(i) = z(i) * adjust
+        x(i) = x(i) * voladjust
+        y(i) = y(i) * voladjust
+        z(i) = z(i) * voladjust
     end do
 
     ! Compute the new density
@@ -106,9 +105,9 @@ contains
         vacc = vacc + 1
     else
         do i = 1, np
-            x(i) = x(i) / adjust
-            y(i) = y(i) / adjust
-            z(i) = z(i) / adjust
+            x(i) = x(i) / voladjust
+            y(i) = y(i) / voladjust
+            z(i) = z(i) / voladjust
         end do
 
         boxl = volold**(1.0_dp / 3.0_dp)
