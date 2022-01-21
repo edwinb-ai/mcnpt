@@ -13,6 +13,8 @@ program main
     real(dp) :: d, rhoave, volratio
     real(dp) :: rng
     real(dp) :: rhoaverage, rhosq, rhoprom, rhodev
+    real(dp) :: volaverage, volsq, volsqave, current_volume
+    real(dp) :: isocompress, isocompressprom, isocompressdev
     integer :: nattemp = 0
     integer :: rngint
     integer :: nacc = 1, i, j
@@ -32,13 +34,22 @@ program main
     d = (1.0_dp/rho)**(1.0_dp/3.0_dp)
     nptvolfreq = np * 2
     avevolfreq = 1000
+    thermsteps = 1e8
+
+    ! Initialization of variables
     rhoave = 0.0_dp
     vacc = 1
     vattemp = 0
     j = 1
     rhoprom = 0.0_dp
     rhosq = 0.0_dp
-    thermsteps = 3e8
+    volaverage = 0.0_dp
+    volsq = 0.0_dp
+    volsqave = 0.0_dp
+    current_volume = 0.0_dp
+    isocompress = 0.0_dp
+    isocompressprom = 0.0_dp
+    isocompressdev = 0.0_dp
 
     print*, 'rc = ', rc
     print*, 'Mean interparticle distance: ', d
@@ -77,7 +88,7 @@ program main
             call adjust(nattemp, nacc, del, 0.35_dp)
         else
             call mcvolume(x, y, z, rhoave, ener, vattemp, vacc)
-            call adjust(vattemp, vacc, dispvol, 0.10_dp)
+            call adjust(vattemp, vacc, dispvol, 0.15_dp)
         end if
         
         if (mod(i, 100) == 0) then
@@ -116,21 +127,42 @@ program main
             rhoaverage = rhoave / vacc
             rhoacc(j) = rhoaverage
             rhoprom = rhoprom + rhoaverage
-            rhosq = rhosq + rhoaverage**2
+            rhosq = rhosq + rhoaverage**2.0_dp
             write(unit=v, fmt='(f12.10)') rhoaverage
             j = j + 1
+
+            ! Compute the fluctuations in the volume
+            current_volume = boxl**3.0_d
+            volaverage = current_volume / real(vattemp, dp)
+            volsq = volsq + current_volume**2.0_dp
+            volsqave = volsq / real(vattemp, dp)
+            ! Compute the isothermal compressibility using the volume fluctuations
+            ! This is the "reduced" isothermal compressibility
+            isocompress = (volsqave - volsq) / (boxl**3.0_dp)
+            isocompressprom = isocompressprom + isocompress
+            isocompressdev = isocompressdev + isocompress**2.0_dp
         end if
     end do
 
     close(u)
     close(v)
+
+    ! Do some averaging for the density
     call block_average(rhoacc)
-    ! Do some averaging
     rhoprom = rhoprom / real(j, dp)
     rhosq = rhosq / real(j, dp)
     rhodev = sqrt(rhosq - rhoprom**2)
+    write(unit=output_unit, fmt='(a)') 'Density'
     write(unit=output_unit, fmt='(a)') 'Average, std deviation'
     write(unit=output_unit, fmt='(2f15.7)') rhoprom, rhodev
+
+    ! Report the results for the isothermal compressibility
+    isocompressprom = isocompressprom / real(j, dp)
+    isocompressdev = isocompressdev / real(j, dp)
+    write(unit=output_unit, fmt='(a)') 'Isothermal compressibility'
+    write(unit=output_unit, fmt='(a)') 'Average, std deviation'
+    write(unit=output_unit, fmt='(2f15.7)') isocompressprom, sqrt(isocompressdev)
+
     ! write the final configuration and the energy
     open(newunit=u, file = 'configuration.dat', status = 'unknown')
     do i = 1, np
