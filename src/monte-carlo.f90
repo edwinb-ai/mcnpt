@@ -30,7 +30,7 @@ program main
     
     ! Update the simulation parameters with this information
     boxl = (np / rho)**(1.0_dp/3.0_dp)
-    rc = boxl * 0.5_dp
+    rc = boxl / 2.0_dp
     d = (1.0_dp/rho)**(1.0_dp/3.0_dp)
     nptvolfreq = np * 2
     avevolfreq = 1000
@@ -85,10 +85,10 @@ program main
 
         if (rngint < np) then
             call mcmove(x, y, z, ener, nattemp, nacc, del)
-            call adjust(nattemp, nacc, del, 0.35_dp)
+            call adjust(nattemp, nacc, del, 0.30_dp)
         else
             call mcvolume(x, y, z, rhoave, ener, vattemp, vacc)
-            call adjust(vattemp, vacc, dispvol, 0.15_dp)
+            call adjust(vattemp, vacc, dispvol, 0.25_dp)
         end if
         
         if (mod(i, 100) == 0) then
@@ -96,7 +96,7 @@ program main
         end if
         
         if (mod(i, 1000000) == 0) then
-            write(unit=output_unit, fmt='(a)') 'MC Step, Particle disp, Energy / N'
+            write(unit=output_unit, fmt='(a)') 'MC Step, Particle disp, Energy / N, Disp ratio'
             print*, i, del, ener/real(np, dp), real(nacc, dp) / real(nattemp, dp)
             write(unit=output_unit, fmt='(a)') 'MC Step, Density average, box size, Vol ratio, Vol disp'
             volratio = real(vacc, dp) / real(vattemp, dp)
@@ -124,23 +124,25 @@ program main
 
         if (mod(i, avevolfreq) == 0) then
             volratio = real(vacc, dp) / real(vattemp, dp)
-            rhoaverage = rhoave / vacc
+            rhoaverage = rhoave / real(vattemp, dp)
             rhoacc(j) = rhoaverage
             rhoprom = rhoprom + rhoaverage
             rhosq = rhosq + rhoaverage**2.0_dp
-            write(unit=v, fmt='(f12.10)') rhoaverage
-            j = j + 1
-
+            write(unit=v, fmt='(f15.12)') rhoaverage
+            
             ! Compute the fluctuations in the volume
-            current_volume = boxl**3.0_d
+            current_volume = boxl**3.0_dp
             volaverage = current_volume / real(vattemp, dp)
             volsq = volsq + current_volume**2.0_dp
             volsqave = volsq / real(vattemp, dp)
             ! Compute the isothermal compressibility using the volume fluctuations
             ! This is the "reduced" isothermal compressibility
-            isocompress = (volsqave - volsq) / (boxl**3.0_dp)
+            isocompress = (volsqave - volsq) / current_volume
             isocompressprom = isocompressprom + isocompress
             isocompressdev = isocompressdev + isocompress**2.0_dp
+            
+            ! Update the accumulation index
+            j = j + 1
         end if
     end do
 
@@ -154,14 +156,14 @@ program main
     rhodev = sqrt(rhosq - rhoprom**2)
     write(unit=output_unit, fmt='(a)') 'Density'
     write(unit=output_unit, fmt='(a)') 'Average, std deviation'
-    write(unit=output_unit, fmt='(2f15.7)') rhoprom, rhodev
+    write(unit=output_unit, fmt='(2f15.10)') rhoprom, rhodev
 
     ! Report the results for the isothermal compressibility
     isocompressprom = isocompressprom / real(j, dp)
     isocompressdev = isocompressdev / real(j, dp)
     write(unit=output_unit, fmt='(a)') 'Isothermal compressibility'
     write(unit=output_unit, fmt='(a)') 'Average, std deviation'
-    write(unit=output_unit, fmt='(2f15.7)') isocompressprom, sqrt(isocompressdev)
+    write(unit=output_unit, fmt='(2f15.10)') isocompressprom, sqrt(isocompressdev)
 
     ! write the final configuration and the energy
     open(newunit=u, file = 'configuration.dat', status = 'unknown')
