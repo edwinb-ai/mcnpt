@@ -124,7 +124,7 @@ program main
 
         if (mod(i, avevolfreq) == 0) then
             volratio = real(vacc, dp) / real(vattemp, dp)
-            rhoaverage = rhoave / real(vattemp, dp)
+            rhoaverage = rhoave / real(vacc, dp)
             rhoacc(j) = rhoaverage
             rhoprom = rhoprom + rhoaverage
             rhosq = rhosq + rhoaverage**2.0_dp
@@ -132,9 +132,9 @@ program main
             
             ! Compute the fluctuations in the volume
             current_volume = boxl**3.0_dp
-            volaverage = current_volume / real(vattemp, dp)
+            volaverage = current_volume / real(vacc, dp)
             volsq = volsq + current_volume**2.0_dp
-            volsqave = volsq / real(vattemp, dp)
+            volsqave = volsq / real(vacc, dp)
             ! Compute the isothermal compressibility using the volume fluctuations
             ! This is the "reduced" isothermal compressibility
             isocompress = (volsqave - volsq) / current_volume
