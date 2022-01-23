@@ -22,9 +22,10 @@ contains
 
         !$omp parallel default(shared) private(i,j,uij,xij,yij,zij,rij)
         !$omp do reduction(+:ener)
-        do i = 1, np
+        do i = 1, np - 1
             do j = 1, np
                 if (i == j) cycle
+            ! do j = i + 1, np
                 uij = 0.0_dp
 
                 xij = x(j)-x(i)

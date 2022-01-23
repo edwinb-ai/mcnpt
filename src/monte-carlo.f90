@@ -9,18 +9,18 @@ program main
 
     ! Local variables, note that somes variables are initialized
     real(dp), allocatable :: x(:), y(:), z(:)
-    real(dp) :: del = 0.7_dp, ener
+    real(dp) :: del = 0.5_dp
     real(dp) :: d, rhoave, volratio
-    real(dp) :: rng
-    real(dp) :: rhoaverage, rhosq, rhoprom, rhodev
-    real(dp) :: volaverage, volsq, volsqave, current_volume
+    real(dp) :: rng, ener
+    real(dp) :: rhoaverage, rhosq, rhoprom
+    real(dp) :: volaverage, volsq, volsqave, current_volume, volave
     real(dp) :: isocompress, isocompressprom, isocompressdev
-    integer :: nattemp = 0
-    integer :: rngint
-    integer :: nacc = 1, i, j
+    integer :: rngint, i, j
     integer :: thermsteps, eqsteps, u, nptvolfreq, vacc, vattemp
-    integer :: v, avevolfreq
-    real(dp), allocatable :: rhoacc(:)
+    integer :: v, avevolfreq, accsize
+    integer :: nattemp = 0
+    integer :: nacc = 1
+    real(dp), allocatable :: rhoacc(:), isocompressacc(:)
 
     ! Initialize the RNG
     call random_seed()
@@ -31,16 +31,16 @@ program main
     ! Update the simulation parameters with this information
     boxl = (np / rho)**(1.0_dp/3.0_dp)
     rc = boxl / 2.0_dp
-    d = (1.0_dp/rho)**(1.0_dp/3.0_dp)
+    d = (1.0_dp / rho)**(1.0_dp/3.0_dp)
     nptvolfreq = np * 2
     avevolfreq = 1000
-    thermsteps = 1e8
+    thermsteps = 1e7
 
     ! Initialization of variables
     rhoave = 0.0_dp
     vacc = 1
     vattemp = 0
-    j = 1
+    j = 0
     rhoprom = 0.0_dp
     rhosq = 0.0_dp
     volaverage = 0.0_dp
@@ -57,8 +57,11 @@ program main
     print*, 'Reference density = ', rho
 
     ! Allocate memory for arrays
-    allocate(x(np), y(np), z(np), rhoacc(eqsteps / avevolfreq))
+    allocate(x(np), y(np), z(np))
+    accsize = eqsteps / avevolfreq
+    allocate(rhoacc(accsize), isocompressacc(accsize))
     rhoacc = 0.0_dp
+    isocompressacc = 0.0_dp
 
     if (from_file) then
         write(unit=output_unit, fmt='(a)') 'Reading from positions file...'
@@ -85,10 +88,10 @@ program main
 
         if (rngint < np) then
             call mcmove(x, y, z, ener, nattemp, nacc, del)
-            call adjust(nattemp, nacc, del, 0.30_dp)
+            call adjust(nattemp, nacc, del, 0.3_dp)
         else
             call mcvolume(x, y, z, rhoave, ener, vattemp, vacc)
-            call adjust(vattemp, vacc, dispvol, 0.25_dp)
+            call adjust(vattemp, vacc, dispvol, 0.2_dp)
         end if
         
         if (mod(i, 100) == 0) then
@@ -112,10 +115,10 @@ program main
 
         if (rngint < np) then
             call mcmove(x, y, z, ener, nattemp, nacc, del)
-            call adjust(nattemp, nacc, del, 0.35_dp)
+            call adjust(nattemp, nacc, del, 0.3_dp)
         else
             call mcvolume(x, y, z, rhoave, ener, vattemp, vacc)
-            call adjust(vattemp, vacc, dispvol, 0.10_dp)
+            call adjust(vattemp, vacc, dispvol, 0.2_dp)
         end if
         
         if (mod(i, avevolfreq) == 0) then
@@ -123,47 +126,43 @@ program main
         end if
 
         if (mod(i, avevolfreq) == 0) then
-            volratio = real(vacc, dp) / real(vattemp, dp)
+            ! Update the accumulation index
+            j = j + 1
+
+            ! Accumulate the results for the density
             rhoaverage = rhoave / real(vacc, dp)
             rhoacc(j) = rhoaverage
             rhoprom = rhoprom + rhoaverage
-            rhosq = rhosq + rhoaverage**2.0_dp
+            rhosq = rhosq + rhoaverage**2
             write(unit=v, fmt='(f15.12)') rhoaverage
             
             ! Compute the fluctuations in the volume
-            current_volume = boxl**3.0_dp
-            volaverage = current_volume / real(vacc, dp)
-            volsq = volsq + current_volume**2.0_dp
-            volsqave = volsq / real(vacc, dp)
+            current_volume = real(np, dp) / rhoaverage
+            volaverage = volaverage + current_volume
+            volave = volaverage / real(j, dp)
+            volsq = volsq + current_volume**2
+            volsqave = volsq / real(j, dp)
             ! Compute the isothermal compressibility using the volume fluctuations
             ! This is the "reduced" isothermal compressibility
-            isocompress = (volsqave - volsq) / current_volume
-            isocompressprom = isocompressprom + isocompress
-            isocompressdev = isocompressdev + isocompress**2.0_dp
-            
-            ! Update the accumulation index
-            j = j + 1
+            isocompress = (volsqave - volave**2) / (current_volume * real(np, dp))
+            ! print*, isocompress
+            isocompressacc(j) = isocompress
         end if
     end do
 
+    ! Close off files that were opened for saving information
     close(u)
     close(v)
 
     ! Do some averaging for the density
-    call block_average(rhoacc)
-    rhoprom = rhoprom / real(j, dp)
-    rhosq = rhosq / real(j, dp)
-    rhodev = sqrt(rhosq - rhoprom**2)
     write(unit=output_unit, fmt='(a)') 'Density'
     write(unit=output_unit, fmt='(a)') 'Average, std deviation'
-    write(unit=output_unit, fmt='(2f15.10)') rhoprom, rhodev
-
+    call block_average(rhoacc)
+                
     ! Report the results for the isothermal compressibility
-    isocompressprom = isocompressprom / real(j, dp)
-    isocompressdev = isocompressdev / real(j, dp)
     write(unit=output_unit, fmt='(a)') 'Isothermal compressibility'
     write(unit=output_unit, fmt='(a)') 'Average, std deviation'
-    write(unit=output_unit, fmt='(2f15.10)') isocompressprom, sqrt(isocompressdev)
+    call block_average(isocompressacc)
 
     ! write the final configuration and the energy
     open(newunit=u, file = 'configuration.dat', status = 'unknown')
@@ -172,6 +171,6 @@ program main
     end do
     close(u)
 
-    deallocate(x, y, z, rhoacc)
+    deallocate(x, y, z, rhoacc, isocompressacc)
 
 end program main
