@@ -20,7 +20,7 @@ program main
     integer :: v, avevolfreq, accsize
     integer :: nattemp = 0
     integer :: nacc = 1
-    real(dp), allocatable :: rhoacc(:), isocompressacc(:)
+    real(dp), allocatable :: rhoacc(:), isocompressacc(:), volacc(:)
 
     ! Initialize the RNG
     call random_seed()
@@ -34,7 +34,7 @@ program main
     d = (1.0_dp / rho)**(1.0_dp/3.0_dp)
     nptvolfreq = np * 2
     avevolfreq = 1000
-    thermsteps = 1e7
+    thermsteps = 2e7
 
     ! Initialization of variables
     rhoave = 0.0_dp
@@ -59,9 +59,10 @@ program main
     ! Allocate memory for arrays
     allocate(x(np), y(np), z(np))
     accsize = eqsteps / avevolfreq
-    allocate(rhoacc(accsize), isocompressacc(accsize))
+    allocate(rhoacc(accsize), isocompressacc(accsize), volacc(accsize))
     rhoacc = 0.0_dp
     isocompressacc = 0.0_dp
+    volacc = 0.0_dp
 
     if (from_file) then
         write(unit=output_unit, fmt='(a)') 'Reading from positions file...'
@@ -135,6 +136,7 @@ program main
             rhoprom = rhoprom + rhoaverage
             rhosq = rhosq + rhoaverage**2
             current_volume = real(np, dp) / rhoaverage
+            volacc(j) = current_volume
             write(unit=v, fmt='(2f18.12)') rhoaverage, current_volume
             
             ! Compute the fluctuations in the volume
@@ -145,7 +147,6 @@ program main
             ! Compute the isothermal compressibility using the volume fluctuations
             ! This is the "reduced" isothermal compressibility
             isocompress = (volsqave - volave**2.0_dp) / volave
-            ! print*, isocompress
             isocompressacc(j) = isocompress
         end if
     end do
@@ -153,6 +154,7 @@ program main
     ! Close off files that were opened for saving information
     close(u)
     close(v)
+    write(unit=output_unit, fmt='(f15.10)') isocompressacc(accsize)
 
     ! Do some averaging for the density
     write(unit=output_unit, fmt='(a)') 'Density'
@@ -164,6 +166,11 @@ program main
     write(unit=output_unit, fmt='(a)') 'Average, std deviation'
     call block_average(isocompressacc)
 
+    ! Report the results for the volume
+    write(unit=output_unit, fmt='(a)') 'Volume'
+    write(unit=output_unit, fmt='(a)') 'Average, std deviation'
+    call block_average(volacc)
+
     ! write the final configuration and the energy
     open(newunit=u, file = 'configuration.dat', status = 'unknown')
     do i = 1, np
@@ -171,6 +178,6 @@ program main
     end do
     close(u)
 
-    deallocate(x, y, z, rhoacc, isocompressacc)
+    deallocate(x, y, z, rhoacc, isocompressacc, volacc)
 
 end program main
