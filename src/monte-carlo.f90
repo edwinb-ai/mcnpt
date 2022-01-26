@@ -34,7 +34,7 @@ program main
     d = (1.0_dp / rho)**(1.0_dp/3.0_dp)
     nptvolfreq = np * 2
     avevolfreq = 1000
-    thermsteps = 5e7
+    thermsteps = 1e7
 
     ! Initialization of variables
     rhoave = 0.0_dp
