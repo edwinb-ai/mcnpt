@@ -77,7 +77,7 @@ contains
 
         if (rij < bpot) then
             uij = (a2/dT)*((1.0_dp/rij)**dlr-(1.0_dp/rij)**dla)
-            uij = uij + 1.0_dp/dT
+            uij = uij + (1.0_dp / dT)
         else
             uij = 0.0_dp
         end if
@@ -104,7 +104,7 @@ contains
 
         if (rij < 1.0_dp) then
             uij = ieee_value(rinf, ieee_positive_inf)
-        elseif ((1.0_dp < rij) .and. (rij < lambdasw)) then
+        elseif ((1.0_dp <= rij) .and. (rij < lambdasw)) then
             uij = -1.0_dp
         else
             uij = 0.0_dp

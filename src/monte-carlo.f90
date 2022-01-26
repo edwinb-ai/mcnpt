@@ -12,8 +12,8 @@ program main
     real(dp) :: del = 0.5_dp
     real(dp) :: d, rhoave, volratio
     real(dp) :: rng, ener
-    real(dp) :: rhoaverage, rhosq, rhoprom
-    real(dp) :: volaverage, volsq, volsqave, current_volume, volave
+    real(dp) :: rhoaverage, rhosq, rhoprom, current_volume
+    real(dp) :: volaverage, volsq, volsqave, volave
     real(dp) :: isocompress, isocompressprom, isocompressdev
     integer :: rngint, i, j
     integer :: thermsteps, eqsteps, u, nptvolfreq, vacc, vattemp
@@ -34,7 +34,7 @@ program main
     d = (1.0_dp / rho)**(1.0_dp/3.0_dp)
     nptvolfreq = np * 2
     avevolfreq = 1000
-    thermsteps = 1e7
+    thermsteps = 5e7
 
     ! Initialization of variables
     rhoave = 0.0_dp
@@ -91,7 +91,7 @@ program main
             call adjust(nattemp, nacc, del, 0.3_dp)
         else
             call mcvolume(x, y, z, rhoave, ener, vattemp, vacc)
-            call adjust(vattemp, vacc, dispvol, 0.2_dp)
+            call adjust(vattemp, vacc, dispvol, 0.3_dp)
         end if
         
         if (mod(i, 100) == 0) then
@@ -134,17 +134,17 @@ program main
             rhoacc(j) = rhoaverage
             rhoprom = rhoprom + rhoaverage
             rhosq = rhosq + rhoaverage**2
-            write(unit=v, fmt='(f15.12)') rhoaverage
+            current_volume = real(np, dp) / rhoaverage
+            write(unit=v, fmt='(2f18.12)') rhoaverage, current_volume
             
             ! Compute the fluctuations in the volume
-            current_volume = real(np, dp) / rhoaverage
             volaverage = volaverage + current_volume
             volave = volaverage / real(j, dp)
-            volsq = volsq + current_volume**2
+            volsq = volsq + current_volume**2.0_dp
             volsqave = volsq / real(j, dp)
             ! Compute the isothermal compressibility using the volume fluctuations
             ! This is the "reduced" isothermal compressibility
-            isocompress = (volsqave - volave**2) / (current_volume * real(np, dp))
+            isocompress = (volsqave - volave**2.0_dp) / volave
             ! print*, isocompress
             isocompressacc(j) = isocompress
         end if

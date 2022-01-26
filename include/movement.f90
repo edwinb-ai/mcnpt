@@ -63,7 +63,7 @@ contains
 
     ! Local variables
     integer :: i
-    real(dp) :: enern, dener 
+    real(dp) :: enern, dener
     real(dp) :: rng, volold, volnew, lnvolnew
     real(dp) :: voladjust, boxlnew, rhold, denpt
 
@@ -89,7 +89,7 @@ contains
 
     ! Compute the new density
     rhold = rho
-    rho = np / volnew
+    rho = real(np, dp) / volnew
 
     ! Compute the energy after adjusting the box
     call energy(x, y, z, enern)
