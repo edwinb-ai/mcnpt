@@ -37,12 +37,10 @@ program main
     nattemp = 0
     nacc = 1
     rhoaverage = 0.0_dp
-    rhoave = 0.0_dp
     vacc = 1
     vattemp = 0
     j = 0
     rhoprom = 0.0_dp
-    rhosq = 0.0_dp
     volaverage = 0.0_dp
     volsq = 0.0_dp
     volsqave = 0.0_dp
@@ -88,7 +86,7 @@ program main
             call mcmove(x, y, z, ener, nattemp, nacc, del)
             call adjust(nattemp, nacc, del, 0.35_dp)
         else
-            call mcvolume(x, y, z, rhoave, ener, vattemp, vacc)
+            call mcvolume(x, y, z, ener, vattemp, vacc)
             call adjust(vattemp, vacc, dispvol, 0.25_dp)
         end if
         
@@ -97,7 +95,7 @@ program main
             print*, i, del, ener/real(np, dp), real(nacc, dp) / real(nattemp, dp)
             write(unit=output_unit, fmt='(a)') 'MC Step, Density average, box size, Vol ratio, Vol disp'
             volratio = real(vacc, dp) / real(vattemp, dp)
-            print*, i, rhoave / vacc, boxl, volratio, dispvol
+            print*, i, rho, boxl, volratio, dispvol
         end if
     end do
 
@@ -120,7 +118,7 @@ program main
             call mcmove(x, y, z, ener, nattemp, nacc, del)
             call adjust(nattemp, nacc, del, 0.35_dp)
         else
-            call mcvolume(x, y, z, rhoave, ener, vattemp, vacc)
+            call mcvolume(x, y, z, ener, vattemp, vacc)
             call adjust(vattemp, vacc, dispvol, 0.25_dp)
         end if
         

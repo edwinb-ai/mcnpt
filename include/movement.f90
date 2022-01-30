@@ -55,8 +55,7 @@ contains
     end if
     end subroutine mcmove
 
-    subroutine mcvolume(x, y, z, rhoave, ener, vattemp, vacc)
-    real(dp), intent(inout) :: rhoave
+    subroutine mcvolume(x, y, z, ener, vattemp, vacc)
     real(dp), intent(in) :: ener
     integer, intent(inout) :: vattemp, vacc
     real(dp), intent(inout) :: x(:), y(:), z(:)
