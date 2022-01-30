@@ -9,17 +9,15 @@ program main
 
     ! Local variables, note that somes variables are initialized
     real(dp), allocatable :: x(:), y(:), z(:)
-    real(dp) :: del = 0.5_dp
-    real(dp) :: d, rhoave, volratio
+    real(dp) :: d, rhoave, volratio, del
     real(dp) :: rng, ener
     real(dp) :: rhoaverage, rhosq, rhoprom, current_volume
     real(dp) :: volaverage, volsq, volsqave, volave
     real(dp) :: isocompress, isocompressprom, isocompressdev
     integer :: rngint, i, j
-    integer :: thermsteps, eqsteps, u, nptvolfreq, vacc, vattemp
+    integer :: thermsteps, eqsteps, u, vacc, vattemp
     integer :: v, avevolfreq, accsize
-    integer :: nattemp = 0
-    integer :: nacc = 1
+    integer :: nattemp, nacc
     real(dp), allocatable :: rhoacc(:), isocompressacc(:), volacc(:)
 
     ! Initialize the RNG
@@ -32,11 +30,14 @@ program main
     boxl = (np / rho)**(1.0_dp/3.0_dp)
     rc = boxl / 2.0_dp
     d = (1.0_dp / rho)**(1.0_dp/3.0_dp)
-    nptvolfreq = np * 2
-    avevolfreq = 1000
-    thermsteps = 2e7
+    avevolfreq = 100000
+    thermsteps = 7e7
 
     ! Initialization of variables
+    del = 0.7_dp
+    nattemp = 0
+    nacc = 1
+    rhoaverage = 0.0_dp
     rhoave = 0.0_dp
     vacc = 1
     vattemp = 0
@@ -80,23 +81,16 @@ program main
     print*, 'E/N for the initial configuration:', ener/np
 
     ! MC cycle to thermalize the system
-    open(newunit=u, file = 'energy.dat', status = 'unknown')
-    open(newunit=v, file = 'density.dat', status = 'unknown')
-    
     do i = 1, thermsteps
         call random_number(rng)
-        rngint = floor((np + 1) * rng)
+        rngint = 1 + floor((np + 1) * rng)
 
-        if (rngint < np) then
+        if (rngint <= np) then
             call mcmove(x, y, z, ener, nattemp, nacc, del)
-            call adjust(nattemp, nacc, del, 0.3_dp)
+            call adjust(nattemp, nacc, del, 0.35_dp)
         else
             call mcvolume(x, y, z, rhoave, ener, vattemp, vacc)
-            call adjust(vattemp, vacc, dispvol, 0.3_dp)
-        end if
-        
-        if (mod(i, 100) == 0) then
-            write(u, '(2f15.7)') real(i, dp), ener / real(np, dp)
+            call adjust(vattemp, vacc, dispvol, 0.25_dp)
         end if
         
         if (mod(i, 1000000) == 0) then
@@ -108,36 +102,45 @@ program main
         end if
     end do
 
+    ! Reset accumulation variables
+    nattemp = 0
+    nacc = 0
+    vattemp = 0
+    vacc = 0
     ! Start accumulating results
     write(unit=output_unit, fmt='(a)') 'Averaging starts...'
+    ! Open the necessary files for saving thermodynamical quantities
+    open(newunit=u, file='energy.dat', status='unknown')
+    open(newunit=v, file='density.dat', status='unknown')
+    ! Production cyle
     do i = 1, eqsteps
         call random_number(rng)
-        rngint = floor((np + 1) * rng)
+        rngint = 1 + floor((np + 1) * rng)
 
-        if (rngint < np) then
+        if (rngint <= np) then
             call mcmove(x, y, z, ener, nattemp, nacc, del)
-            call adjust(nattemp, nacc, del, 0.3_dp)
+            call adjust(nattemp, nacc, del, 0.35_dp)
         else
             call mcvolume(x, y, z, rhoave, ener, vattemp, vacc)
-            call adjust(vattemp, vacc, dispvol, 0.2_dp)
+            call adjust(vattemp, vacc, dispvol, 0.25_dp)
         end if
         
         if (mod(i, avevolfreq) == 0) then
+            ! Save the value for the energy
             write(unit=u, fmt='(2f15.12)') real(i, dp), ener / real(np, dp)
-        end if
-
-        if (mod(i, avevolfreq) == 0) then
+            
             ! Update the accumulation index
             j = j + 1
 
             ! Accumulate the results for the density
-            rhoaverage = rhoave / real(vacc, dp)
-            rhoacc(j) = rhoaverage
-            rhoprom = rhoprom + rhoaverage
+            rhoaverage = rhoaverage + rho
+            rhoprom = rhoaverage / real(j, dp)
+            rhoacc(j) = rho
+            ! rhoprom = rhoprom + rhoaverage
             rhosq = rhosq + rhoaverage**2
-            current_volume = real(np, dp) / rhoaverage
+            current_volume = real(np, dp) / rho
             volacc(j) = current_volume
-            write(unit=v, fmt='(2f18.12)') rhoaverage, current_volume
+            write(unit=v, fmt='(2f18.12)') rhoprom, current_volume
             
             ! Compute the fluctuations in the volume
             volaverage = volaverage + current_volume

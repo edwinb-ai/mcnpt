@@ -75,7 +75,7 @@ contains
         a_var_1 = sum(xcentre**2) / real(nstep-1, dp) ! Bias-corrected sample variance
         print*, a_avg, sqrt(a_var_1)
 
-        do nblock = 18, 4, -1 ! Loop over number, and hence length, of blocks
+        do nblock = 20, 4, -1 ! Loop over number, and hence length, of blocks
 
             tblock = nstep / nblock              ! Block length in steps (rounded down)
             trun   = nblock*tblock               ! Run length in steps, accounting for rounding

@@ -22,7 +22,7 @@ contains
     nattemp = nattemp + 1
 
     call random_number(rng)
-    no = int(rng * np)+1
+    no = 1 + floor(np * rng)
     call denergy(x, y, z, no, enero)
 
     xo = x(no)
@@ -71,7 +71,7 @@ contains
     vattemp = vattemp + 1
 
     ! Estimate the new volume
-    volold = boxl**3
+    volold = boxl**3.0_dp
     call random_number(rng)
     lnvolnew = log(volold) + (dispvol * (rng - 0.5_dp))
     volnew = exp(lnvolnew)
@@ -110,7 +110,7 @@ contains
             z(i) = z(i) / voladjust
         end do
 
-        boxl = volold**(1.0_dp / 3.0_dp)
+        boxl = volold**(1.0_dp/3.0_dp)
         rho = rhold
         rc = boxl / 2.0_dp
     end if
@@ -125,7 +125,7 @@ contains
         real(dp) :: ratio
 
         if (mod(nattemp, nacc) == 0) then
-            ratio = real(nacc, dp)/real(nattemp, dp)
+            ratio = real(nacc, dp) / real(nattemp, dp)
             if (ratio > tol) then
                 del = del * 1.05_dp
             else
