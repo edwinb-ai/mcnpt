@@ -7,17 +7,16 @@ program main
     use, intrinsic :: iso_fortran_env, only: output_unit
     implicit none
 
-    ! Local variables, note that somes variables are initialized
-    real(dp), allocatable :: x(:), y(:), z(:)
-    real(dp) :: d, rhoave, volratio, del
-    real(dp) :: rng, ener
-    real(dp) :: rhoaverage, rhosq, rhoprom, current_volume
+    ! Local scalar variables
+    real(dp) :: d, volratio, del, rng, ener
+    real(dp) :: rhoaverage, rhoprom, current_volume
     real(dp) :: volaverage, volsq, volsqave, volave
     real(dp) :: isocompress, isocompressprom, isocompressdev
-    integer :: rngint, i, j
+    integer :: rngint, i, j, nattemp, nacc
     integer :: thermsteps, eqsteps, u, vacc, vattemp
     integer :: v, avevolfreq, accsize
-    integer :: nattemp, nacc
+    ! Local arrays
+    real(dp), allocatable :: x(:), y(:), z(:)
     real(dp), allocatable :: rhoacc(:), isocompressacc(:), volacc(:)
 
     ! Initialize the RNG
@@ -136,8 +135,6 @@ program main
             rhoaverage = rhoaverage + rho
             rhoprom = rhoaverage / real(j, dp)
             rhoacc(j) = rho
-            ! rhoprom = rhoprom + rhoaverage
-            rhosq = rhosq + rhoaverage**2
             current_volume = real(np, dp) / rho
             volacc(j) = current_volume
             write(unit=v, fmt='(2f18.12)') rhoprom, current_volume
