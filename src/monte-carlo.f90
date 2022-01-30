@@ -29,7 +29,7 @@ program main
     boxl = (np / rho)**(1.0_dp/3.0_dp)
     rc = boxl / 2.0_dp
     d = (1.0_dp / rho)**(1.0_dp/3.0_dp)
-    avevolfreq = 100000
+    avevolfreq = 10000
     thermsteps = 7e7
 
     ! Initialization of variables
