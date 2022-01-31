@@ -55,7 +55,8 @@ contains
     end if
     end subroutine mcmove
 
-    subroutine mcvolume(x, y, z, ener, vattemp, vacc)
+    subroutine mcvolume(x, y, z, rhoave, ener, vattemp, vacc)
+    real(dp), intent(inout) :: rhoave
     real(dp), intent(in) :: ener
     integer, intent(inout) :: vattemp, vacc
     real(dp), intent(inout) :: x(:), y(:), z(:)
@@ -100,6 +101,7 @@ contains
     ! Apply Metropolis criteria
     call random_number(rng)
     if (rng < exp(-denpt / ktemp)) then
+        rhoave = rhoave + rho
         vacc = vacc + 1
     else
         do i = 1, np

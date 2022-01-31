@@ -9,8 +9,8 @@ program main
 
     ! Local scalar variables
     real(dp) :: d, volratio, del, rng, ener
-    real(dp) :: rhoaverage, rhoprom, current_volume
-    real(dp) :: volaverage, volsq, volsqave, volave
+    real(dp) :: rhoaverage, rhoprom, rhoave
+    real(dp) :: volaverage, volsq, volsqave, volave, current_volume
     real(dp) :: isocompress, isocompressprom, isocompressdev
     integer :: rngint, i, j, nattemp, nacc
     integer :: thermsteps, eqsteps, u, vacc, vattemp
@@ -30,13 +30,14 @@ program main
     rc = boxl / 2.0_dp
     d = (1.0_dp / rho)**(1.0_dp/3.0_dp)
     avevolfreq = 10000
-    thermsteps = 7e7
+    thermsteps = 5e7
 
     ! Initialization of variables
     del = 0.7_dp
     nattemp = 0
     nacc = 1
     rhoaverage = 0.0_dp
+    rhoave = 0.0_dp
     vacc = 1
     vattemp = 0
     j = 0
@@ -86,7 +87,7 @@ program main
             call mcmove(x, y, z, ener, nattemp, nacc, del)
             call adjust(nattemp, nacc, del, 0.35_dp)
         else
-            call mcvolume(x, y, z, ener, vattemp, vacc)
+            call mcvolume(x, y, z, rhoave, ener, vattemp, vacc)
             call adjust(vattemp, vacc, dispvol, 0.25_dp)
         end if
         
@@ -95,15 +96,15 @@ program main
             print*, i, del, ener/real(np, dp), real(nacc, dp) / real(nattemp, dp)
             write(unit=output_unit, fmt='(a)') 'MC Step, Density average, box size, Vol ratio, Vol disp'
             volratio = real(vacc, dp) / real(vattemp, dp)
-            print*, i, rho, boxl, volratio, dispvol
+            print*, i, rhoave / vacc, boxl, volratio, dispvol
         end if
     end do
 
     ! Reset accumulation variables
     nattemp = 0
-    nacc = 0
+    nacc = 1
     vattemp = 0
-    vacc = 0
+    vacc = 1
     ! Start accumulating results
     write(unit=output_unit, fmt='(a)') 'Averaging starts...'
     ! Open the necessary files for saving thermodynamical quantities
@@ -118,7 +119,7 @@ program main
             call mcmove(x, y, z, ener, nattemp, nacc, del)
             call adjust(nattemp, nacc, del, 0.35_dp)
         else
-            call mcvolume(x, y, z, ener, vattemp, vacc)
+            call mcvolume(x, y, z, rhoave, ener, vattemp, vacc)
             call adjust(vattemp, vacc, dispvol, 0.25_dp)
         end if
         
