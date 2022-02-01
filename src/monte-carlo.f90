@@ -17,7 +17,8 @@ program main
     integer :: v, avevolfreq, accsize
     ! Local arrays
     real(dp), allocatable :: x(:), y(:), z(:)
-    real(dp), allocatable :: rhoacc(:), isocompressacc(:), volacc(:)
+    real(dp), allocatable :: rhoacc(:), isocompressacc(:)
+    real(dp), allocatable :: volacc(:), volsqacc(:)
 
     ! Initialize the RNG
     call random_seed()
@@ -40,6 +41,7 @@ program main
     vattemp = 0
     j = 0
     rhoprom = 0.0_dp
+    volave = 0.0_dp
     volaverage = 0.0_dp
     volsq = 0.0_dp
     volsqave = 0.0_dp
@@ -56,10 +58,12 @@ program main
     ! Allocate memory for arrays
     allocate(x(np), y(np), z(np))
     accsize = eqsteps / avevolfreq
-    allocate(rhoacc(accsize), isocompressacc(accsize), volacc(accsize))
+    allocate(rhoacc(accsize), isocompressacc(accsize))
+    allocate(volacc(accsize), volsqacc(accsize))
     rhoacc = 0.0_dp
     isocompressacc = 0.0_dp
     volacc = 0.0_dp
+    volsqacc = 0.0_dp
 
     ! Either read a configuration file or generate a new one
     if (from_file) then
@@ -137,19 +141,18 @@ program main
             rhoacc(j) = rho
             current_volume = real(np, dp) / rho
             volacc(j) = current_volume
+            volsqacc(j) = current_volume**2.0_dp
             
             ! Compute the fluctuations in the volume
-            volaverage = volaverage + current_volume
-            volave = volaverage / real(j, dp)
-            volsq = volsq + current_volume**2.0_dp
-            volsqave = volsq / real(j, dp)
-            ! Compute the isothermal compressibility using the volume fluctuations
-            ! This is the "reduced" isothermal compressibility
-            isocompress = (volsqave - volave**2.0_dp) / volave
-            isocompressacc(j) = isocompress
+            ! volave = volaverage / real(avevolfreq, dp)
+            ! volsqave = volsq / real(avevolfreq, dp)
+            ! ! Compute the isothermal compressibility using the volume fluctuations
+            ! ! This is the "reduced" isothermal compressibility
+            ! isocompress = (volsqave - volave**2.0_dp) / volave
+            ! isocompressacc(j) = isocompress
 
             ! Save all results to file
-            write(unit=v, fmt='(3f18.12)') rhoprom, current_volume, isocompress
+            write(unit=v, fmt='(3f19.12)') rhoprom, current_volume, isocompress
         end if
     end do
 
@@ -159,27 +162,19 @@ program main
     write(unit=output_unit, fmt='(f15.10)') isocompressacc(accsize)
 
     ! Do some averaging for the density
-    write(unit=output_unit, fmt='(a)') 'Density'
-    write(unit=output_unit, fmt='(a)') 'Average, std deviation'
-    call block_average(rhoacc)
-                
-    ! Report the results for the isothermal compressibility
-    write(unit=output_unit, fmt='(a)') 'Isothermal compressibility'
-    write(unit=output_unit, fmt='(a)') 'Average, std deviation'
-    call block_average(isocompressacc)
+    call calc_variable(rhoacc, 'Density', 'density.dat')
+    ! Do some averaging for the volume
+    call calc_variable(volacc, 'Volume', 'volume.dat')
+    ! Do some averaging for the squared volume
+    call calc_variable(volsqacc, 'Squared Volume', 'sqvolume.dat')
 
-    ! Report the results for the volume
-    write(unit=output_unit, fmt='(a)') 'Volume'
-    write(unit=output_unit, fmt='(a)') 'Average, std deviation'
-    call block_average(volacc)
-
-    ! write the final configuration and the energy
+    ! write the final configuration to file
     open(newunit=u, file = 'configuration.dat', status = 'unknown')
     do i = 1, np
         write(unit=u, fmt='(3f15.7)') x(i), y(i), z(i)
     end do
     close(u)
 
-    deallocate(x, y, z, rhoacc, isocompressacc, volacc)
+    deallocate(x, y, z, rhoacc, isocompressacc, volacc, volsqacc)
 
 end program main

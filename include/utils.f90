@@ -1,10 +1,11 @@
 module utils
     use types
     use parameters
+    use, intrinsic :: iso_fortran_env, only: output_unit
 
     implicit none
 
-    public iniconfig, parse_input, block_average
+    public iniconfig, parse_input, calc_variable
 
 contains
     subroutine iniconfig(x, y, z, d)
@@ -62,9 +63,11 @@ contains
         close(u)
     end subroutine parse_input
 
-    subroutine block_average(x)
+    subroutine block_average(x, filein)
         real(dp), intent(in) :: x(:)
+        character(len=*), intent(in) :: filein
 
+        integer :: u
         integer :: nstep, tblock, nblock, blk, stp1, stp2, trun
         real(dp) :: a_blk, a_run, a_var, a_var_1, a_err, si, a_avg
         real(dp), allocatable :: xcentre(:)
@@ -75,6 +78,9 @@ contains
         xcentre = x - a_avg                    ! Centre the data
         a_var_1 = sum(xcentre**2) / real(nstep-1, dp) ! Bias-corrected sample variance
         print*, a_avg, sqrt(a_var_1)
+
+        ! Open file to save information
+        open(newunit=u, file=filein, status='unknown')
 
         do nblock = 20, 4, -1 ! Loop over number, and hence length, of blocks
 
@@ -94,15 +100,23 @@ contains
             a_err = sqrt(a_var/real(nblock, dp))  ! Estimate of error from block-average variance
             si = tblock * a_var / a_var_1  ! Statistical inefficiency
 
-            ! WRITE ( unit=output_unit, fmt='(2i15,3f15.6)' ) tblock, nblock, a_err, si
-            print*, tblock, nblock, a_err, a_run, si
-
+            write(unit=u, fmt='(2f15.6)' ) a_run, a_err
         end do ! End loop over number, and hence length, of blocks
 
     ! WRITE ( unit=output_unit, fmt='(a)' ) 'Plateau at large tblock (small nblock)'
     ! WRITE ( unit=output_unit, fmt='(a)' ) 'should agree quite well with exact error estimate'
     ! WRITE ( unit=output_unit, fmt='(a)' ) 'Can plot SI or error**2 against 1/tblock'
+    close(u)
     deallocate(xcentre)
 
     end subroutine block_average
+
+    subroutine calc_variable(avevar, avename, fname)
+        character(len=*), intent(in) :: avename, fname
+        real(dp), intent(in) :: avevar(:)
+
+        write(unit=output_unit, fmt='(a)') avename
+        write(unit=output_unit, fmt='(a)') 'Average, std deviation'
+        call block_average(avevar, fname)
+    end subroutine calc_variable
 end module utils
