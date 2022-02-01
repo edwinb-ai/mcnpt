@@ -29,8 +29,8 @@ program main
     boxl = (np / rho)**(1.0_dp/3.0_dp)
     rc = boxl / 2.0_dp
     d = (1.0_dp / rho)**(1.0_dp/3.0_dp)
-    avevolfreq = 10000
-    thermsteps = 5e7
+    avevolfreq = 100000
+    thermsteps = 1e8
 
     ! Initialization of variables
     del = 0.7_dp
@@ -63,6 +63,7 @@ program main
     isocompressacc = 0.0_dp
     volacc = 0.0_dp
 
+    ! Either read a configuration file or generate a new one
     if (from_file) then
         write(unit=output_unit, fmt='(a)') 'Reading from positions file...'
         open(newunit=u, file = 'configuration.dat', status = 'unknown')
@@ -70,10 +71,12 @@ program main
                 read(u, *) x(i), y(i), z(i)
             end do
         close(u)
+    else
+        ! initial configuration as a simple lattice
+        call iniconfig(x, y, z, d)
     end if
 
-    ! initial configuration and initial energy
-    call iniconfig(x, y, z, d)
+    ! Initial configuration energy, regardless of how it was created
     call energy(x, y, z, ener)
 
     print*, 'E/N for the initial configuration:', ener/np
@@ -88,7 +91,7 @@ program main
             call adjust(nattemp, nacc, del, 0.35_dp)
         else
             call mcvolume(x, y, z, rhoave, ener, vattemp, vacc)
-            call adjust(vattemp, vacc, dispvol, 0.25_dp)
+            call adjust(vattemp, vacc, dispvol, 0.2_dp)
         end if
         
         if (mod(i, 1000000) == 0) then
@@ -120,7 +123,7 @@ program main
             call adjust(nattemp, nacc, del, 0.35_dp)
         else
             call mcvolume(x, y, z, rhoave, ener, vattemp, vacc)
-            call adjust(vattemp, vacc, dispvol, 0.25_dp)
+            call adjust(vattemp, vacc, dispvol, 0.2_dp)
         end if
         
         if (mod(i, avevolfreq) == 0) then
