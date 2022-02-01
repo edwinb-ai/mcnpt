@@ -118,21 +118,21 @@ program main
         
         if (mod(i, avevolfreq) == 0) then
             ! Save the value for the energy
-            write(unit=u, fmt='(2f15.12)') real(i, dp), ener / real(np, dp)
+            write(unit=u, fmt='(2f15.8)') real(i, dp), ener / real(np, dp)
             
             ! Update the accumulation index
             j = j + 1
 
             ! Accumulate the results for the density
+            current_volume = real(np, dp) / rho
             rhoaverage = rhoaverage + rho
             rhoprom = rhoaverage / real(j, dp)
             rhoacc(j) = rho
-            current_volume = real(np, dp) / rho
             volacc(j) = current_volume
             volsqacc(j) = current_volume**2.0_dp
 
             ! Save all results to file
-            write(unit=v, fmt='(3f19.12)') rhoprom, current_volume
+            write(unit=v, fmt='(2f17.10)') rhoprom, current_volume
         end if
     end do
 
@@ -141,16 +141,16 @@ program main
     close(v)
 
     ! Do some averaging for the density
-    call calc_variable(rhoacc, 'Density', 'density.dat')
+    call calc_variable(rhoacc, 'Density', 'average_density.dat')
     ! Do some averaging for the volume
-    call calc_variable(volacc, 'Volume', 'volume.dat')
+    call calc_variable(volacc, 'Volume', 'average_volume.dat')
     ! Do some averaging for the squared volume
-    call calc_variable(volsqacc, 'Squared Volume', 'sqvolume.dat')
+    call calc_variable(volsqacc, 'Squared Volume', 'average_sqvolume.dat')
 
     ! write the final configuration to file
     open(newunit=u, file = 'configuration.dat', status = 'unknown')
     do i = 1, np
-        write(unit=u, fmt='(3f15.7)') x(i), y(i), z(i)
+        write(unit=u, fmt='(3f14.8)') x(i), y(i), z(i)
     end do
     close(u)
 

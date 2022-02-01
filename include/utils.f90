@@ -100,7 +100,7 @@ contains
             a_err = sqrt(a_var/real(nblock, dp))  ! Estimate of error from block-average variance
             si = tblock * a_var / a_var_1  ! Statistical inefficiency
 
-            write(unit=u, fmt='(2f15.6)' ) a_run, a_err
+            write(unit=u, fmt='(2f16.9)') a_run, a_err
         end do ! End loop over number, and hence length, of blocks
 
     ! WRITE ( unit=output_unit, fmt='(a)' ) 'Plateau at large tblock (small nblock)'
