@@ -9,16 +9,13 @@ program main
 
     ! Local scalar variables
     real(dp) :: d, volratio, del, rng, ener
-    real(dp) :: rhoaverage, rhoprom, rhoave
-    real(dp) :: volaverage, volsq, volsqave, volave, current_volume
-    real(dp) :: isocompress, isocompressprom, isocompressdev
+    real(dp) :: rhoaverage, rhoave, current_volume, rhoprom
     integer :: rngint, i, j, nattemp, nacc
     integer :: thermsteps, eqsteps, u, vacc, vattemp
     integer :: v, avevolfreq, accsize
     ! Local arrays
     real(dp), allocatable :: x(:), y(:), z(:)
-    real(dp), allocatable :: rhoacc(:), isocompressacc(:)
-    real(dp), allocatable :: volacc(:), volsqacc(:)
+    real(dp), allocatable :: rhoacc(:), volacc(:), volsqacc(:)
 
     ! Initialize the RNG
     call random_seed()
@@ -37,18 +34,11 @@ program main
     nacc = 1
     rhoaverage = 0.0_dp
     rhoave = 0.0_dp
+    rhoprom = 0.0_dp
     vacc = 1
     vattemp = 0
     j = 0
-    rhoprom = 0.0_dp
-    volave = 0.0_dp
-    volaverage = 0.0_dp
-    volsq = 0.0_dp
-    volsqave = 0.0_dp
     current_volume = 0.0_dp
-    isocompress = 0.0_dp
-    isocompressprom = 0.0_dp
-    isocompressdev = 0.0_dp
 
     print*, 'rc = ', rc
     print*, 'Mean interparticle distance: ', d
@@ -58,10 +48,8 @@ program main
     ! Allocate memory for arrays
     allocate(x(np), y(np), z(np))
     accsize = eqsteps / avevolfreq
-    allocate(rhoacc(accsize), isocompressacc(accsize))
-    allocate(volacc(accsize), volsqacc(accsize))
+    allocate(rhoacc(accsize), volacc(accsize), volsqacc(accsize))
     rhoacc = 0.0_dp
-    isocompressacc = 0.0_dp
     volacc = 0.0_dp
     volsqacc = 0.0_dp
 
@@ -142,24 +130,15 @@ program main
             current_volume = real(np, dp) / rho
             volacc(j) = current_volume
             volsqacc(j) = current_volume**2.0_dp
-            
-            ! Compute the fluctuations in the volume
-            ! volave = volaverage / real(avevolfreq, dp)
-            ! volsqave = volsq / real(avevolfreq, dp)
-            ! ! Compute the isothermal compressibility using the volume fluctuations
-            ! ! This is the "reduced" isothermal compressibility
-            ! isocompress = (volsqave - volave**2.0_dp) / volave
-            ! isocompressacc(j) = isocompress
 
             ! Save all results to file
-            write(unit=v, fmt='(3f19.12)') rhoprom, current_volume, isocompress
+            write(unit=v, fmt='(3f19.12)') rhoprom, current_volume
         end if
     end do
 
     ! Close off files that were opened for saving information
     close(u)
     close(v)
-    write(unit=output_unit, fmt='(f15.10)') isocompressacc(accsize)
 
     ! Do some averaging for the density
     call calc_variable(rhoacc, 'Density', 'density.dat')
@@ -175,6 +154,6 @@ program main
     end do
     close(u)
 
-    deallocate(x, y, z, rhoacc, isocompressacc, volacc, volsqacc)
+    deallocate(x, y, z, rhoacc, volacc, volsqacc)
 
 end program main
