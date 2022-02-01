@@ -41,24 +41,25 @@ contains
         end do
     end subroutine iniconfig ! note that the out is x, y, z vector
 
-    subroutine parse_input(filein, limg)
+    subroutine parse_input(filein, limg, limterm, avefreq)
         character(len = *), intent(in) :: filein
-        integer, intent(inout) :: limg
+        integer, intent(inout) :: limg, limterm, avefreq
 
-        ! Variables locales
+        ! Local variables
         integer :: u
 
         open(newunit=u, file=filein, status='old')
-        ! Leer todas las variables
+        ! Read in the local variables
         read(u, *) rho
         read(u, *) ktemp
         read(u, *) pressure
         read(u, *) dispvol
         read(u, *) np
         read(u, *) limg
+        read(u, *) limterm
+        read(u, *) avefreq
         read(u, *) from_file
         close(u)
-        
     end subroutine parse_input
 
     subroutine block_average(x)

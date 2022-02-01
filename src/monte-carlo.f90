@@ -23,14 +23,12 @@ program main
     call random_seed()
 
     ! Read an input file that contains all the necessary information
-    call parse_input('input.in', eqsteps)
+    call parse_input('input.in', eqsteps, thermsteps, avevolfreq)
     
     ! Update the simulation parameters with this information
     boxl = (np / rho)**(1.0_dp/3.0_dp)
     rc = boxl / 2.0_dp
     d = (1.0_dp / rho)**(1.0_dp/3.0_dp)
-    avevolfreq = 100000
-    thermsteps = 1e8
 
     ! Initialization of variables
     del = 0.7_dp
@@ -139,7 +137,6 @@ program main
             rhoacc(j) = rho
             current_volume = real(np, dp) / rho
             volacc(j) = current_volume
-            write(unit=v, fmt='(2f18.12)') rhoprom, current_volume
             
             ! Compute the fluctuations in the volume
             volaverage = volaverage + current_volume
@@ -150,6 +147,9 @@ program main
             ! This is the "reduced" isothermal compressibility
             isocompress = (volsqave - volave**2.0_dp) / volave
             isocompressacc(j) = isocompress
+
+            ! Save all results to file
+            write(unit=v, fmt='(3f18.12)') rhoprom, current_volume, isocompress
         end if
     end do
 
