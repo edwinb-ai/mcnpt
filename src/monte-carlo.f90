@@ -78,7 +78,7 @@ program main
 
         if (rngint <= np) then
             call mcmove(x, y, z, ener, nattemp, nacc, del)
-            call adjust(nattemp, nacc, del, 0.35_dp)
+            call adjust(nattemp, nacc, del, 0.3_dp)
         else
             call mcvolume(x, y, z, rhoave, ener, vattemp, vacc)
             call adjust(vattemp, vacc, dispvol, 0.2_dp)
@@ -110,7 +110,7 @@ program main
 
         if (rngint <= np) then
             call mcmove(x, y, z, ener, nattemp, nacc, del)
-            call adjust(nattemp, nacc, del, 0.35_dp)
+            call adjust(nattemp, nacc, del, 0.3_dp)
         else
             call mcvolume(x, y, z, rhoave, ener, vattemp, vacc)
             call adjust(vattemp, vacc, dispvol, 0.2_dp)
@@ -118,7 +118,7 @@ program main
         
         if (mod(i, avevolfreq) == 0) then
             ! Save the value for the energy
-            write(unit=u, fmt='(2f15.8)') real(i, dp), ener / real(np, dp)
+            write(unit=u, fmt='(2f15.10)') real(i, dp), ener / real(np, dp)
             
             ! Update the accumulation index
             j = j + 1
