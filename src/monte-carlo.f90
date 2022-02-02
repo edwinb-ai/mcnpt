@@ -118,7 +118,7 @@ program main
         
         if (mod(i, avevolfreq) == 0) then
             ! Save the value for the energy
-            write(unit=u, fmt='(2f15.10)') real(i, dp), ener / real(np, dp)
+            write(unit=u, fmt='(i12.2, f15.10)') i, ener/real(np, dp)
             
             ! Update the accumulation index
             j = j + 1
