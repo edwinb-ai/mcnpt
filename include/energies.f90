@@ -85,6 +85,4 @@ contains
         end do
         !$omp end parallel do
     end subroutine denergy
-
-    
 end module energies
