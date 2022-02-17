@@ -22,15 +22,13 @@ contains
 
         !$omp parallel default(shared) private(i,j,uij,xij,yij,zij,rij)
         !$omp do reduction(+:ener)
-        do i = 1, np
-            do j = 1, np
-                if (i == j) cycle
-            ! do j = i + 1, np
+        do i = 1, (np - 1)
+            do j = (i + 1), np
                 uij = 0.0_dp
 
-                xij = x(j)-x(i)
-                yij = y(j)-y(i)
-                zij = z(j)-z(i)
+                xij = x(j) - x(i)
+                yij = y(j) - y(i)
+                zij = z(j) - z(i)
 
                 ! Minimum image convention
                 xij = xij-boxl*nint(xij/boxl)
@@ -47,8 +45,6 @@ contains
         end do
         !$omp end do
         !$omp end parallel
-
-        ener = ener / 2.0_dp
     end subroutine energy
 
     ! This subroutine calculates the difference in energy when a particle is displaced
