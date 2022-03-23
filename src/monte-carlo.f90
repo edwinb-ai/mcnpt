@@ -84,15 +84,15 @@ program main
                 call mcvolume(x, y, z, rhoave, ener, vattemp, vacc)
                 call adjust(vattemp, vacc, dispvol, 0.25_dp)
             end if
-            
-            if (mod(i, 10000) == 0) then
-                write(unit=output_unit, fmt='(a)') 'MC Step, Particle disp, Energy / N, Disp ratio'
-                print*, i, del, ener/real(np, dp), real(nacc, dp) / real(nattemp, dp)
-                write(unit=output_unit, fmt='(a)') 'MC Step, Density average, box size, Vol ratio, Vol disp'
-                volratio = real(vacc, dp) / real(vattemp, dp)
-                print*, i, rhoave / vacc, boxl, volratio, dispvol
-            end if
         end do
+            
+        if (mod(i, 10000) == 0) then
+            write(unit=output_unit, fmt='(a)') 'MC Step, Particle disp, Energy / N, Disp ratio'
+            print*, i, del, ener/real(np, dp), real(nacc, dp) / real(nattemp, dp)
+            write(unit=output_unit, fmt='(a)') 'MC Step, Density average, box size, Vol ratio, Vol disp'
+            volratio = real(vacc, dp) / real(vattemp, dp)
+            print*, i, rhoave / vacc, boxl, volratio, dispvol
+        end if
     end do
 
     ! Reset accumulation variables
@@ -118,26 +118,26 @@ program main
                 call mcvolume(x, y, z, rhoave, ener, vattemp, vacc)
                 ! call adjust(vattemp, vacc, dispvol, 0.2_dp)
             end if
-            
-            if (mod(i, avevolfreq) == 0) then
-                ! Save the value for the energy
-                write(unit=u, fmt='(i12.2, f15.10)') i, ener/real(np, dp)
-                
-                ! Update the accumulation index
-                j = j + 1
-
-                ! Accumulate the results for the density
-                current_volume = real(np, dp) / rho
-                rhoaverage = rhoaverage + rho
-                rhoprom = rhoaverage / real(j, dp)
-                rhoacc(j) = rho
-                volacc(j) = current_volume
-                volsqacc(j) = current_volume**2.0_dp
-
-                ! Save all results to file
-                write(unit=v, fmt='(2f17.10)') rhoprom, current_volume
-            end if
         end do
+        
+        if (mod(i, avevolfreq) == 0) then
+            ! Save the value for the energy
+            write(unit=u, fmt='(i12.2, f15.10)') i, ener/real(np, dp)
+            
+            ! Update the accumulation index
+            j = j + 1
+
+            ! Accumulate the results for the density
+            current_volume = real(np, dp) / rho
+            rhoaverage = rhoaverage + rho
+            rhoprom = rhoaverage / real(j, dp)
+            rhoacc(j) = rho
+            volacc(j) = current_volume
+            volsqacc(j) = current_volume**2.0_dp
+
+            ! Save all results to file
+            write(unit=v, fmt='(2f17.10)') rhoprom, current_volume
+        end if
     end do
 
     ! Close off files that were opened for saving information
