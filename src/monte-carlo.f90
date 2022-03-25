@@ -29,7 +29,7 @@ program main
     d = (1.0_dp / rho)**(1.0_dp/3.0_dp)
 
     ! Initialization of variables
-    del = 0.7_dp
+    del = 2.0_dp
     nattemp = 0
     nacc = 1
     rhoaverage = 0.0_dp
@@ -157,7 +157,4 @@ program main
         write(unit=u, fmt='(3f14.8)') x(i), y(i), z(i)
     end do
     close(u)
-
-    deallocate(x, y, z, rhoacc, volacc, volsqacc)
-
 end program main
