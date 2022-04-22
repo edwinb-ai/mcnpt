@@ -10,7 +10,7 @@ module parameters
     real(dp), parameter :: diam = 1.0_dp
 
     ! User dependant parameters
-    real(dp) :: rho, boxl, rc, ktemp, pressure, dispvol
+    real(dp) :: rho, boxl, rc, ktemp, pressure, del, dispvol
     integer :: np
     logical :: from_file
 end module parameters

@@ -8,8 +8,7 @@ module movement
     public mcmove, adjust, mcvolume
 contains
     ! This subroutine displace the system to a new configuration
-    subroutine mcmove(x, y, z, ener, nattemp, nacc, del)
-        real(dp), intent(in) :: del
+    subroutine mcmove(x, y, z, ener, nattemp, nacc)
         real(dp), intent(inout) :: ener
         integer, intent(inout) :: nattemp, nacc
         real(dp), intent(inout) :: x(:), y(:), z(:)
@@ -117,20 +116,20 @@ contains
     end subroutine mcvolume
 
     ! This subroutine adjusts the displacement of particles
-    subroutine adjust(nattemp, nacc, del, tol)
-            integer, intent(in) :: nattemp, nacc
-            real(dp), intent(in) :: tol
-            real(dp), intent(inout) :: del
-            ! Local variables
-            real(dp) :: ratio
+    subroutine adjust(nattemp, nacc, disp, tol)
+        integer, intent(in) :: nattemp, nacc
+        real(dp), intent(in) :: tol
+        real(dp), intent(inout) :: disp
+        ! Local variables
+        real(dp) :: ratio
 
-            if (mod(nattemp, nacc) == 0) then
-                ratio = real(nacc, dp) / real(nattemp, dp)
-                if (ratio > tol) then
-                    del = del * 1.05_dp
-                else
-                    del = del * 0.95_dp
-                end if
+        if (mod(nattemp, nacc) == 0) then
+            ratio = real(nacc, dp) / real(nattemp, dp)
+            if (ratio > tol) then
+                disp = disp * 1.05_dp
+            else
+                disp = disp * 0.95_dp
             end if
+        end if
     end subroutine adjust
 end module movement

@@ -54,6 +54,7 @@ contains
         read(u, *) rho
         read(u, *) ktemp
         read(u, *) pressure
+        read(u, *) del
         read(u, *) dispvol
         read(u, *) np
         read(u, *) limg

@@ -8,7 +8,7 @@ program main
     implicit none
 
     ! Local scalar variables
-    real(dp) :: d, volratio, del, rng, ener
+    real(dp) :: d, volratio, rng, ener
     real(dp) :: rhoaverage, rhoave, current_volume, rhoprom
     integer :: rngint, i, j, k, nattemp, nacc
     integer :: thermsteps, eqsteps, u, vacc, vattemp
@@ -29,7 +29,6 @@ program main
     d = (1.0_dp / rho)**(1.0_dp/3.0_dp)
 
     ! Initialization of variables
-    del = 2.0_dp
     nattemp = 0
     nacc = 1
     rhoaverage = 0.0_dp
@@ -78,11 +77,11 @@ program main
             rngint = 1 + floor((np + 1) * rng)
 
             if (rngint <= np) then
-                call mcmove(x, y, z, ener, nattemp, nacc, del)
-                call adjust(nattemp, nacc, del, 0.35_dp)
+                call mcmove(x, y, z, ener, nattemp, nacc)
+                call adjust(nattemp, nacc, del, 0.4_dp)
             else
                 call mcvolume(x, y, z, rhoave, ener, vattemp, vacc)
-                call adjust(vattemp, vacc, dispvol, 0.25_dp)
+                call adjust(vattemp, vacc, dispvol, 0.2_dp)
             end if
         end do
             
@@ -112,11 +111,9 @@ program main
             rngint = 1 + floor((np + 1) * rng)
 
             if (rngint <= np) then
-                call mcmove(x, y, z, ener, nattemp, nacc, del)
-                ! call adjust(nattemp, nacc, del, 0.3_dp)
+                call mcmove(x, y, z, ener, nattemp, nacc)
             else
                 call mcvolume(x, y, z, rhoave, ener, vattemp, vacc)
-                ! call adjust(vattemp, vacc, dispvol, 0.2_dp)
             end if
         end do
         

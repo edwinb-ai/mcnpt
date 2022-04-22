@@ -5,3 +5,6 @@ p*phi*
 *.py
 *.sif
 *.def
+
+# Data files
+np*
