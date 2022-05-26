@@ -18,7 +18,7 @@ program main
     real(dp), allocatable :: rhoacc(:), volacc(:), volsqacc(:)
 
     ! Initialize the RNG
-    call random_seed()
+    call random_init(.false., .true.)
 
     ! Read an input file that contains all the necessary information
     call parse_input('input.in', eqsteps, thermsteps, avevolfreq)
@@ -39,10 +39,12 @@ program main
     j = 0
     current_volume = 0.0_dp
 
-    print*, 'rc = ', rc
-    print*, 'Mean interparticle distance: ', d
-    print*, 'Pressure = ', pressure
-    print*, 'Reference density = ', rho
+    ! Write information to screen
+    write(unit=output_unit, fmt='(a,f6.4)') 'Cut-off radius = ', rc
+    write(unit=output_unit, fmt='(a,f6.4)') 'Mean interparticle distance: ', d
+    write(unit=output_unit, fmt='(a,f6.4)') 'Reduced pressure = ', pressure
+    write(unit=output_unit, fmt='(a,f6.4)') 'Reference reduced density = ', rho
+    write(unit=output_unit, fmt='(a,f6.4)') 'Reduced temperature = ', ktemp
 
     ! Allocate memory for arrays
     allocate(x(np), y(np), z(np))
@@ -67,30 +69,33 @@ program main
 
     ! Initial configuration energy, regardless of how it was created
     call energy(x, y, z, ener)
-
-    print*, 'E/N for the initial configuration:', ener/np
+    write(unit=output_unit, fmt='(a,f7.4)') 'E/N for the initial configuration:', ener/np
 
     ! MC cycle to thermalize the system
     do i = 1, thermsteps
+        ! Loop for the total number of particles
         do k = 1, np
             call random_number(rng)
             rngint = 1 + floor((np + 1) * rng)
 
             if (rngint <= np) then
                 call mcmove(x, y, z, ener, nattemp, nacc)
-                call adjust(nattemp, nacc, del, 0.4_dp)
+                call adjust(nattemp, nacc, del, 0.35_dp)
             else
                 call mcvolume(x, y, z, rhoave, ener, vattemp, vacc)
-                call adjust(vattemp, vacc, dispvol, 0.2_dp)
+                call adjust(vattemp, vacc, dispvol, 0.15_dp)
             end if
         end do
-            
+
+        ! Print information to screen
         if (mod(i, 10000) == 0) then
             write(unit=output_unit, fmt='(a)') 'MC Step, Particle disp, Energy / N, Disp ratio'
-            print*, i, del, ener/real(np, dp), real(nacc, dp) / real(nattemp, dp)
+            write(unit=output_unit, fmt='(i10, 3f8.4)') i, del, ener/real(np, dp), &
+                & real(nacc, dp) / real(nattemp, dp)
             write(unit=output_unit, fmt='(a)') 'MC Step, Density average, box size, Vol ratio, Vol disp'
             volratio = real(vacc, dp) / real(vattemp, dp)
-            print*, i, rhoave / vacc, boxl, volratio, dispvol
+            write(unit=output_unit, fmt='(i10, 4f8.4)') i, rhoave / real(vacc, dp), &
+                & boxl, volratio, dispvol
         end if
     end do
 
