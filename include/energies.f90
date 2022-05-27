@@ -38,7 +38,7 @@ contains
                 rij = norm2([xij, yij, zij])
 
                 if (rij < rc) then
-                    call hardsphere(rij, uij)
+                    call square_well(rij, uij)
                     ener = ener + uij
                 end if
             end do
@@ -75,7 +75,7 @@ contains
             rij = norm2([xij, yij, zij])
 
             if (rij < rc) then
-                call hardsphere(rij, uij)
+                call square_well(rij, uij)
                 dener = dener + uij
             end if
         end do

@@ -40,11 +40,11 @@ program main
     current_volume = 0.0_dp
 
     ! Write information to screen
-    write(unit=output_unit, fmt='(a,f6.4)') 'Cut-off radius = ', rc
-    write(unit=output_unit, fmt='(a,f6.4)') 'Mean interparticle distance: ', d
-    write(unit=output_unit, fmt='(a,f6.4)') 'Reduced pressure = ', pressure
-    write(unit=output_unit, fmt='(a,f6.4)') 'Reference reduced density = ', rho
-    write(unit=output_unit, fmt='(a,f6.4)') 'Reduced temperature = ', ktemp
+    write(unit=output_unit, fmt='(a,f8.4)') 'Cut-off radius = ', rc
+    write(unit=output_unit, fmt='(a,f8.4)') 'Mean interparticle distance: ', d
+    write(unit=output_unit, fmt='(a,f8.4)') 'Reduced pressure = ', pressure
+    write(unit=output_unit, fmt='(a,f8.4)') 'Reference reduced density = ', rho
+    write(unit=output_unit, fmt='(a,f8.4)') 'Reduced temperature = ', ktemp
 
     ! Allocate memory for arrays
     allocate(x(np), y(np), z(np))
@@ -69,7 +69,7 @@ program main
 
     ! Initial configuration energy, regardless of how it was created
     call energy(x, y, z, ener)
-    write(unit=output_unit, fmt='(a,f7.4)') 'E/N for the initial configuration:', ener/np
+    write(unit=output_unit, fmt='(a,f8.4)') 'E/N for the initial configuration:', ener/np
 
     ! MC cycle to thermalize the system
     do i = 1, thermsteps
